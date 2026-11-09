@@ -45,12 +45,30 @@
       <h1>Serverless Telegram Bot on AWS Lambda</h1>
       <div class="article-meta">
         <span>Built: September 2026</span>
+        <a href="#start">Jump to START ↓</a>
       </div>
     </div>
   </header>
 
   <article class="article-body">
     <div class="container--narrow">
+
+      <!-- START: Situation, Task, Action, Result, Takeaway -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>Getting sales details meant logging in to Square every day or so, which was tedious. Asking a Telegram chat for the numbers was easier.</td></tr>
+              <tr><td><strong>Task</strong></td><td>Answer sales questions in Telegram any time, with no server to keep up, a public address only Telegram can use, and a bill near $0.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Packaged it as a container image on AWS Lambda behind Amazon API Gateway, defined it in Terraform and deployed it with GitHub Actions. Every call must carry Telegram's secret token.</td></tr>
+              <tr><td><strong>Result</strong></td><td>Live and redeployed on every merge to <code>main</code>, after fixing four build and cold-start problems. Estimated cost: under $1 a month.</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>Check what your AWS account allows before designing around a feature (mine blocked Lambda Function URLs), and read the logs to find what slows a cold start before guessing.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <!-- 1. Business Requirement -->
       <div class="callout">

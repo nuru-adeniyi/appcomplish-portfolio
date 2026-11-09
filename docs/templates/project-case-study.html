@@ -3,7 +3,8 @@
   PROJECT CASE STUDY TEMPLATE  (copy to src/projects/<project-slug>.html)
 
   Models to match: src/projects/s3-static-website.html and src/projects/s3-cicd-pipeline.html.
-  Five parts, about 600-800 words total: Business Requirement, At a glance, Figure, Problems I Hit and How I
+  A START block (Situation, Task, Action, Result, Takeaway) with a "Jump to START" link in the header, then five parts,
+  about 600-800 words total: Business Requirement, At a glance, Figure, Problems I Hit and How I
   Fixed Them (omit when nothing went wrong), Design Considerations. Standard: docs/conventions.md.
   "Not available" is fine for a value you cannot find; "n/a — reason" is fine for a table row that does not apply.
   Every `TODO:` must be replaced. /review blocks pages that still contain "TODO:" or "Placeholder"
@@ -54,12 +55,30 @@
       <h1>TODO: Project Name</h1>
       <div class="article-meta">
         <span>TODO: Built: Month YYYY</span>
+        <a href="#start">Jump to START ↓</a>
       </div>
     </div>
   </header>
 
   <article class="article-body">
     <div class="container--narrow">
+
+      <!-- START: one short line each, true to what was built. Situation = why it was needed; Task = the goal; Action = what I did; Result = what I can show; Takeaway = what I learned. Do not repeat the sections below, summarise them. -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>TODO</td></tr>
+              <tr><td><strong>Task</strong></td><td>TODO</td></tr>
+              <tr><td><strong>Action</strong></td><td>TODO</td></tr>
+              <tr><td><strong>Result</strong></td><td>TODO</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>TODO</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <!-- 1. BUSINESS REQUIREMENT: start straight with the requirement ("Build a ... on ... that must ..."), no backstory, one short paragraph, then the design question. No bullets. -->
       <div class="callout">
