@@ -1,0 +1,30 @@
+%% Paste into https://mermaid.live to export PNG or SVG for the resume.
+flowchart LR
+    subgraph RUN["Runtime - on demand, every Telegram message"]
+        direction LR
+        U["Telegram user<br/>(/report or a question)"] -->|"HTTPS webhook + secret token"| APIGW["Amazon API Gateway<br/>HTTP API"]
+        APIGW -->|"AWS_PROXY"| LAM["AWS Lambda<br/>container image"]
+        LAM -->|"live sales data"| SQ["Square API"]
+        LAM -->|"tool calling"| OAI["OpenAI API"]
+        LAM -->|"text + charts"| U
+        LAM -.->|"logs"| CW["Amazon CloudWatch Logs"]
+    end
+
+    subgraph DAILY["Scheduled - daily report, no AWS"]
+        direction LR
+        CRON["GitHub Actions cron<br/>07:00 UTC daily<br/>(or manual run)"] --> JOB["daily_close_job.py"]
+        JOB -->|"yesterday's sales"| SQ2["Square API"]
+        JOB -->|"text + charts"| TG["Telegram chat"]
+    end
+
+    subgraph CD["Deploy - every merge to main"]
+        direction LR
+        GH["Push to main<br/>touching src/"] --> GA["GitHub Actions<br/>ruff + pytest"]
+        GA --> BUILD["Docker build<br/>tagged by commit SHA"]
+        BUILD --> ECR["Amazon ECR<br/>keeps latest 10 images"]
+        ECR -->|"update-function-code"| LAM
+    end
+
+    TF["Terraform<br/>(run once by hand)"] -.->|"provisions"| LAM
+    TF -.-> APIGW
+    TF -.-> ECR

@@ -44,12 +44,30 @@
       <h1>S3 Static Website Hosting</h1>
       <div class="article-meta">
         <span>Built: October 2026</span>
+        <a href="#start">Jump to START ↓</a>
       </div>
     </div>
   </header>
 
   <article class="article-body">
     <div class="container--narrow">
+
+      <!-- START: Situation, Task, Action, Result, Takeaway -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>I needed a portfolio on my own domain, and I wanted to build the hosting on AWS myself.</td></tr>
+              <tr><td><strong>Task</strong></td><td>Serve a static site over HTTPS on <code>appcomplish.click</code> from a private Amazon S3 bucket, for under $1 a month.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Built it in four stages with Amazon Route 53, Amazon CloudFront and AWS Certificate Manager (ACM), opening the site after each stage. Then locked the bucket to CloudFront with Origin Access Control (OAC).</td></tr>
+              <tr><td><strong>Result</strong></td><td><code>https://appcomplish.click</code> and <code>www</code> both return 200 through CloudFront, HTTP redirects to HTTPS, and the bucket is private.</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>A working redirect says nothing about the origin, and building in stages shows which change broke the site.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <!-- 1. Business Requirement -->
       <div class="callout">

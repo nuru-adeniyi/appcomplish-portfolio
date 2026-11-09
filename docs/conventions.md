@@ -132,10 +132,11 @@ appcomplish-portfolio/
 
 ## Project Case Study Standard
 
-Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html`: **five parts, about 600–800 words**, written so a recruiter gets the point in 30 seconds and the detail in two minutes. Each fact appears once.
+Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html`: **a START block plus five parts, about 600–800 words**, written so a recruiter gets the point in 30 seconds and the detail in two minutes. Each fact appears once.
 
 | # | Section | Purpose |
 |---|---|---|
+| 0 | START | Top of the page, `id="start"`, with a "Jump to START ↓" link in the header. Five one-line rows: Situation (why it was needed), Task (the goal), Action (what I did), Result (what I can show), Takeaway (what I learned). Summarise the sections below, never repeat them |
 | 1 | Business Requirement | Starts straight with the requirement ("Build a ... that must ...", own domain, no stored keys, low cost...) in one short paragraph, no backstory, then the design question |
 | 2 | At a glance | Key decision, Stack (with region), Monthly cost (estimate), Status. A Source row (GitHub link) is allowed on CI/CD pages |
 | 3 | Figure | One diagram and a short caption, then an optional Proof line (a result that shows it works). Pages that will get an architecture image keep a "coming soon" slot until it exists; CI/CD pages have none. Run `/diagram <slug>` for the layout standard. Under the Figure, a collapsible services list (`<details class="services">`): one row per AWS service or tool actually used, with its purpose here and a link to its official page |

@@ -44,12 +44,30 @@
       <h1>CI/CD to S3 with GitHub Actions and OIDC</h1>
       <div class="article-meta">
         <span>Built: October 2026</span>
+        <a href="#start">Jump to START ↓</a>
       </div>
     </div>
   </header>
 
   <article class="article-body">
     <div class="container--narrow">
+
+      <!-- START: Situation, Task, Action, Result, Takeaway -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>Copying the site files to the Amazon S3 bucket by hand after every change was slow and easy to get wrong.</td></tr>
+              <tr><td><strong>Task</strong></td><td>Deploy automatically with GitHub Actions using no stored AWS keys, limited to one bucket, with a preview first and a cache clear after.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Set up an OpenID Connect (OIDC) role in AWS Identity and Access Management (IAM) that GitHub Actions assumes, added inline policies for one bucket and one cache clear, and ran a dry run before the real run.</td></tr>
+              <tr><td><strong>Result</strong></td><td>The dry run listed 10 uploads and 1 delete. After the real run the main pages returned 200 and the deleted page returned 404. Auto-deploy is on.</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>Read what GitHub actually sent (in AWS CloudTrail) instead of guessing the trust policy, and remember that copying files to S3 does not refresh the CloudFront cache.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <!-- 1. Business Requirement -->
       <div class="callout">

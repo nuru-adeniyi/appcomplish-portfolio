@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <title>Serverless Telegram Bot on AWS Lambda — Nurudeen Adeniyi</title>
+  <meta name="description" content="Case study: running a Telegram sales-analytics bot on AWS Lambda behind Amazon API Gateway, deployed as a container image with Terraform and GitHub Actions. Alternatives, cost, and the errors I solved." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+  <nav class="nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Nurudeen <span>Adeniyi</span></a>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle menu">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../about.html">About</a></li>
+        <li><a href="../resume.html">Resume &amp; Certs</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="article-header">
+    <div class="container--narrow">
+      <a class="back-link" href="../projects.html">← All Projects</a>
+      <div class="tag-row">
+        <span class="tag">Lambda</span>
+        <span class="tag">API Gateway</span>
+        <span class="tag">ECR</span>
+        <span class="tag">Terraform</span>
+        <span class="tag">Docker</span>
+        <span class="tag">GitHub Actions</span>
+      </div>
+      <span class="card-status card-status--built">Built</span>
+      <h1>Serverless Telegram Bot on AWS Lambda</h1>
+      <div class="article-meta">
+        <span>Built: September 2026</span>
+        <a href="#start">Jump to START ↓</a>
+      </div>
+    </div>
+  </header>
+
+  <article class="article-body">
+    <div class="container--narrow">
+
+      <!-- START: Situation, Task, Action, Result, Takeaway -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>Getting sales details meant logging in to Square every day or so, which was tedious. Asking a Telegram chat for the numbers was easier.</td></tr>
+              <tr><td><strong>Task</strong></td><td>Answer sales questions in Telegram any time, with no server to keep up, a public address only Telegram can use, and a bill near $0.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Packaged it as a container image on AWS Lambda behind Amazon API Gateway, defined it in Terraform and deployed it with GitHub Actions. Every call must carry Telegram's secret token.</td></tr>
+              <tr><td><strong>Result</strong></td><td>Live and redeployed on every merge to <code>main</code>, after fixing four build and cold-start problems. Estimated cost: under $1 a month.</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>Check what your AWS account allows before designing around a feature (mine blocked Lambda Function URLs), and read the logs to find what slows a cold start before guessing.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 1. Business Requirement -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>
+          Build a Telegram bot that answers a small bakery's sales questions from live Square data, with no
+          server to keep running, a public HTTPS address that only genuine Telegram messages can use, and a
+          bill close to $0.
+        </p>
+        <p><strong>How would you host a chat bot that is idle most of the day?</strong></p>
+      </div>
+
+      <!-- 2. At a glance -->
+      <dl class="glance">
+        <div><dt>Key decision</dt><dd><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html" target="_blank" rel="noopener">Amazon API Gateway HTTP API</a> in front of an <a href="https://aws.amazon.com/lambda/" target="_blank" rel="noopener">AWS Lambda</a> container image, because Lambda's own public URL was blocked</dd></div>
+        <div><dt>Stack</dt><dd>AWS Lambda, API Gateway, <a href="https://aws.amazon.com/ecr/" target="_blank" rel="noopener">Amazon Elastic Container Registry (ECR)</a>, <a href="https://aws.amazon.com/iam/" target="_blank" rel="noopener">AWS Identity and Access Management (IAM)</a>, Terraform, GitHub Actions, in us-east-1</dd></div>
+        <div><dt>Monthly cost</dt><dd>Under $1 (estimate), mostly image storage</dd></div>
+        <div><dt>Status</dt><dd>Live, auto-deploy on every merge to <code>main</code></dd></div>
+      </dl>
+
+      <!-- 3. Figure -->
+      <div class="diagram-box">
+        <svg viewBox="0 0 760 260" role="img" aria-label="Two flows. Runtime: a Telegram message goes to Amazon API Gateway, then to an AWS Lambda function, which calls the Square and OpenAI APIs and replies through Telegram. Deploy: a merge to main runs tests in GitHub Actions, builds a Docker image, pushes it to Amazon Elastic Container Registry (ECR) and updates the Lambda function." style="width:100%;height:auto;">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0L10 5L0 10z" fill="var(--text-muted)"/>
+            </marker>
+          </defs>
+          <g font-family="Inter, system-ui, sans-serif" font-size="13" text-anchor="middle">
+            <text x="6" y="20" fill="var(--text-muted)" font-size="12" font-weight="600" text-anchor="start">RUNTIME — every message</text>
+            <text x="6" y="150" fill="var(--text-muted)" font-size="12" font-weight="600" text-anchor="start">DEPLOY — every merge to main</text>
+            <g stroke="var(--border)" fill="var(--bg-subtle)">
+              <rect x="6" y="30" width="130" height="70" rx="8"/>
+              <rect x="166" y="30" width="130" height="70" rx="8"/>
+              <rect x="326" y="30" width="130" height="70" rx="8"/>
+              <rect x="486" y="30" width="130" height="70" rx="8"/>
+              <rect x="646" y="30" width="108" height="70" rx="8"/>
+              <rect x="6" y="160" width="130" height="70" rx="8"/>
+              <rect x="166" y="160" width="130" height="70" rx="8"/>
+              <rect x="326" y="160" width="130" height="70" rx="8"/>
+              <rect x="486" y="160" width="130" height="70" rx="8"/>
+              <rect x="646" y="160" width="108" height="70" rx="8"/>
+            </g>
+            <g fill="var(--text)" font-weight="600">
+              <text x="71" y="60">1. Telegram</text><text x="231" y="60">2. API Gateway</text>
+              <text x="391" y="60">3. Lambda</text><text x="551" y="60">4. Square + OpenAI</text>
+              <text x="700" y="60">5. Reply</text>
+              <text x="71" y="190">1. Merge</text><text x="231" y="190">2. Actions</text>
+              <text x="391" y="190">3. Docker build</text><text x="551" y="190">4. Amazon ECR</text>
+              <text x="700" y="190">5. Lambda</text>
+            </g>
+            <g fill="var(--text-muted)" font-size="11.5">
+              <text x="71" y="80">webhook POST</text><text x="71" y="94">with secret token</text>
+              <text x="231" y="80">HTTP API,</text><text x="231" y="94">$default route</text>
+              <text x="391" y="80">checks secret,</text><text x="391" y="94">allow-list</text>
+              <text x="551" y="80">live sales data,</text><text x="551" y="94">tool calling</text>
+              <text x="700" y="80">text + charts</text><text x="700" y="94">to the chat</text>
+              <text x="71" y="210">push to main</text><text x="71" y="224">touching src/</text>
+              <text x="231" y="210">ruff + pytest</text><text x="231" y="224">must pass</text>
+              <text x="391" y="210">image tagged</text><text x="391" y="224">by commit SHA</text>
+              <text x="551" y="210">keeps latest</text><text x="551" y="224">10 images</text>
+              <text x="700" y="210">code updated,</text><text x="700" y="224">wait for ready</text>
+            </g>
+            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow)">
+              <line x1="138" y1="65" x2="162" y2="65"/><line x1="298" y1="65" x2="322" y2="65"/>
+              <line x1="458" y1="65" x2="482" y2="65"/><line x1="618" y1="65" x2="642" y2="65"/>
+              <line x1="138" y1="195" x2="162" y2="195"/><line x1="298" y1="195" x2="322" y2="195"/>
+              <line x1="458" y1="195" x2="482" y2="195"/><line x1="618" y1="195" x2="642" y2="195"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <p class="diagram-caption">Figure 1 — Messages reach Lambda through API Gateway, which needs no request signing, so Telegram can call it. A container image carries the charting libraries that do not fit a zip package. The daily report is separate: a GitHub Actions schedule sends it to Telegram without using AWS.</p>
+
+      <details class="services">
+        <summary>Services and tools in this project and what each does</summary>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Service or tool</th><th>Purpose here</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://aws.amazon.com/lambda/" target="_blank" rel="noopener">AWS Lambda</a></td><td>Runs the bot as a <a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html" target="_blank" rel="noopener">container image</a> (512 MB memory, 30 s timeout), once per incoming message.</td></tr>
+              <tr><td><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html" target="_blank" rel="noopener">Amazon API Gateway (HTTP API)</a></td><td>The public HTTPS address Telegram posts to; passes the raw request straight to Lambda.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/ecr/" target="_blank" rel="noopener">Amazon ECR</a></td><td>Stores the container images, with a lifecycle policy that expires old ones.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/iam/" target="_blank" rel="noopener">AWS IAM</a></td><td>The Lambda execution role (log writing only) and a deploy user limited to one ECR repository and one function.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/cloudwatch/" target="_blank" rel="noopener">Amazon CloudWatch Logs</a></td><td>Receives the function's logs; used to find the slow cold starts (Problem 4).</td></tr>
+              <tr><td><a href="https://developer.hashicorp.com/terraform" target="_blank" rel="noopener">Terraform</a></td><td>Defines the ECR repository, Lambda function, API Gateway and IAM resources as code.</td></tr>
+              <tr><td><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions</a></td><td>Tests, builds and deploys on every merge to <code>main</code>. A <a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule" target="_blank" rel="noopener">scheduled workflow</a> also runs daily at 07:00 UTC and sends yesterday's sales report and charts to Telegram.</td></tr>
+              <tr><td><a href="https://core.telegram.org/bots/api#setwebhook" target="_blank" rel="noopener">Telegram Bot API webhook</a></td><td>Delivers each message to the API Gateway address with a secret token header.</td></tr>
+              <tr><td><a href="https://developer.squareup.com/" target="_blank" rel="noopener">Square API</a> and <a href="https://platform.openai.com/docs/guides/function-calling" target="_blank" rel="noopener">OpenAI tool calling</a></td><td>Square holds the sales data. OpenAI picks which of my Python functions to run, and my code fetches the real numbers.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <!-- 4. Problems -->
+      <h2 id="problems">Problems I Hit and How I Fixed Them</h2>
+      <p>The bot first ran on my laptop by polling Telegram. Moving it to AWS broke four things.</p>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 1</div>
+        <p><strong>Lambda's own public URL was blocked</strong><br />
+          <strong>Trying to:</strong> give Telegram an HTTPS address to post messages to. A <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html" target="_blank" rel="noopener">Lambda Function URL</a> was my first choice.<br />
+          <strong>What happened:</strong> my AWS account blocks Function URLs that allow anonymous calls.<br />
+          <strong>Why:</strong> Telegram cannot sign requests with AWS credentials. Putting Amazon CloudFront in front of a signed Function URL did not help either, because Lambda wants a payload hash that only an AWS-aware client can compute.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li>In <code>infra/apigateway.tf</code>, define an HTTP API with a <code>$default</code> route and an <code>AWS_PROXY</code> integration to the function.</li>
+          <li>Add an <code>aws_lambda_permission</code> so API Gateway may invoke the function.</li>
+          <li>Because the address has no AWS-level login, the handler checks the <code>X-Telegram-Bot-Api-Secret-Token</code> header and returns 401 if it is missing or wrong.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 2</div>
+        <p><strong>Lambda rejected my Docker image</strong><br />
+          <strong>Trying to:</strong> create and update the function from an image built on my laptop.<br />
+          <strong>What happened:</strong> Lambda refused it with <code>image manifest ... is not supported</code>.<br />
+          <strong>Why:</strong> current Docker Desktop attaches extra provenance and SBOM (software bill of materials) manifests, and Lambda does not accept an image built that way.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li>Build with <code>docker build --provenance=false --sbom=false</code>.</li>
+          <li>Add the same flags to the build step in <code>.github/workflows/deploy-bot.yml</code>.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 3</div>
+        <p><strong>The Python 3.11 base image would not build</strong><br />
+          <strong>Trying to:</strong> install numpy and matplotlib into the Lambda image.<br />
+          <strong>What happened:</strong> <code>pip</code> fell back to compiling from source, and that failed.<br />
+          <strong>Why:</strong> AWS's 3.11 Lambda image sits on Amazon Linux 2, whose C library is too old for the current prebuilt wheels, and the compiler there is too old to build them.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li>In the <code>Dockerfile</code>, change <code>FROM</code> to <code>public.ecr.aws/lambda/python:3.12</code>, which uses Amazon Linux 2023.</li>
+          <li>In <code>pyproject.toml</code>, allow both 3.11 and 3.12 so one lockfile covers local work and the image.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 4</div>
+        <p><strong>Some first messages after a quiet spell were very slow</strong><br />
+          <strong>Trying to:</strong> reply with sales charts quickly.<br />
+          <strong>What happened:</strong> the CloudWatch logs showed cold starts (a new Lambda container starting up) taking 2 to 10 seconds or more, and one hit Lambda's roughly 10-second start-up limit and failed.<br />
+          <strong>Why:</strong> matplotlib scans about 200 font files on its first import, and Lambda wipes <code>/tmp</code> between containers, so the scan ran every time. Baking the cache into the image did not work, because matplotlib needs a writable folder and the image is read-only at runtime.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li>In the <code>Dockerfile</code>, import matplotlib once at build time with <code>MPLCONFIGDIR</code> set to a seed folder, and ship that folder inside the image.</li>
+          <li>Before matplotlib is imported, <code>chart_renderer.py</code> copies the seed folder into <code>/tmp</code>, so the scan becomes a small file copy.</li>
+        </ol>
+      </div>
+
+      <!-- 5. Design Considerations (includes cost) -->
+      <h2>Design Considerations</h2>
+      <div class="table-wrap">
+        <table class="cost-table design-table">
+          <thead><tr><th>Category</th><th>Decision</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Requirements &amp; workload</td><td>A private bot for the bakery's owners: only chat IDs on an allow-list get answers. Idle most of the day, so it runs only when a message arrives.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Scalability &amp; performance</td><td>Lambda starts one invocation per message. The handler builds fresh clients every time, trading a little speed for avoiding a reused event loop. API Gateway cuts integrations off at about 29 seconds, so day-by-day questions are capped at 180 days and monthly ones at 36 months.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Availability &amp; fault tolerance</td><td>Managed services only, with no extra redundancy built. Handled errors still return 200, because any other reply makes Telegram resend the same message. Alarms and a dead-letter queue are missing.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Data &amp; consistency</td><td>n/a — no database; Square stores the sales data and the bot reads it live.</td><td><span class="pill pill--na">n/a</span></td></tr>
+            <tr><td>Security</td><td>Secret-token check, chat allow-list, and an execution role that can only write logs. The deploy user can reach one ECR repository and one function. Weak spots: API keys sit in Lambda environment variables, readable by anyone with console access, and the deploy user has a long-lived access key, unlike the OIDC role in my <a href="s3-cicd-pipeline.html">S3 pipeline</a>.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Observability</td><td>Logs go to CloudWatch, including rejected calls and failed updates, and they found the cold-start problem. No metrics dashboard or alerts.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Deployment &amp; DevOps</td><td>Terraform builds the infrastructure. A merge touching <code>src/</code> runs lint and tests, pushes a commit-tagged image, updates the function and waits until it is ready. An ECR lifecycle policy keeps the latest 10 images. Terraform state is a local file, not shared.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr class="is-best"><td>Cost &amp; trade-offs</td><td>Under $1 a month (estimate). <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="noopener">Lambda</a> and <a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank" rel="noopener">API Gateway</a> bill per request, so an idle bot costs almost nothing. <a href="https://aws.amazon.com/ecr/pricing/" target="_blank" rel="noopener">ECR</a> storage is the one steady charge; the lifecycle policy stops old images piling up. Rejected: an always-on <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2</a> instance or <a href="https://aws.amazon.com/fargate/pricing/" target="_blank" rel="noopener">AWS Fargate</a> task, billed all day for a bot that is idle most of it; and a Lambda Function URL, which my account blocks.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout" style="margin-top:2rem;">
+        <div class="callout-label">Related</div>
+        The same <a href="s3-cicd-pipeline.html">GitHub Actions pipeline pattern</a> deploys this site to Amazon S3.
+      </div>
+
+    </div>
+  </article>
+
+  <footer>
+    <p>
+      Nurudeen Adeniyi ·
+      <a href="https://github.com/nuru-adeniyi" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nurudeen-adeniyi-06249b9" target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
