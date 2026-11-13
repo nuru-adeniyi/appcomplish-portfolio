@@ -132,7 +132,7 @@ appcomplish-portfolio/
 
 ## Project Case Study Standard
 
-Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html`: **a START block plus five parts, about 600–800 words**, written so a recruiter gets the point in 30 seconds and the detail in two minutes. Each fact appears once.
+Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html`: **a START block plus five parts, about 700–900 words**, written so a recruiter gets the point in 30 seconds and the detail in two minutes. Each fact appears once.
 
 | # | Section | Purpose |
 |---|---|---|
@@ -141,7 +141,7 @@ Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html
 | 2 | At a glance | Key decision, Stack (with region), Monthly cost (estimate), Status. A Source row (GitHub link) is allowed on CI/CD pages |
 | 3 | Figure | One diagram and a short caption, then an optional Proof line (a result that shows it works). Pages that will get an architecture image keep a "coming soon" slot until it exists; CI/CD pages have none. Run `/diagram <slug>` for the layout standard. Under the Figure, a collapsible services list (`<details class="services">`): one row per AWS service or tool actually used, with its purpose here and a link to its official page |
 | 4 | Problems I Hit and How I Fixed Them | Real problems only. Each is a red callout (Trying to, What happened, Why) followed by a green Fix callout with numbered steps that name where to click. Omit the section when nothing went wrong; never invent a problem. An option table is allowed for a decision that mattered |
-| 5 | Design Considerations | The 8 Core categories from `docs/system-design-concepts.md`, columns Category, Decision, Status. Cost lives in its row: the estimate, the rejected AWS options and the pricing links |
+| 5 | Design Considerations | The 8 Core categories from `docs/system-design-concepts.md`, columns Category, Decision, How I'd explain it, Status. "How I'd explain it" is one first-person line a reader could say aloud, built only from what was built, seen or sourced; write "—" for `n/a` and Not addressed yet rows. Cost lives in its row: the estimate, the rejected AWS options and the pricing links |
 
 - **Status labels** (Design Considerations): `Addressed`, `Partly addressed`, `Not addressed yet`, or `n/a` with a reason in the Decision. Use "Not available" for a value you cannot find.
 - **Callout classes:** `callout--problem` (red), `callout--fix` (green), `diagram-slot` (reserved image space). Colour tokens are in `style.css`.
