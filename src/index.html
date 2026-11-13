@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Nurudeen Adeniyi" />
   <meta property="og:title" content="Nurudeen Adeniyi — Transitioning to Cloud Engineering &amp; DevOps" />
-  <meta property="og:description" content="Senior software engineer with 18+ years in .NET, transitioning into cloud engineering and DevOps on AWS. Real projects, decisions and tradeoffs." />
+  <meta property="og:description" content="Senior software engineer with 10+ years in .NET, transitioning into cloud engineering and DevOps on AWS. Real projects, decisions and tradeoffs." />
   <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,7 +29,9 @@
         </svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="projects.html">Projects</a></li>
+        <li><a href="aws-cloud.html">AWS &amp; Cloud</a></li>
+        <li><a href="devops.html">DevOps</a></li>
+        <li><a href="ai-automation.html">AI &amp; Automation</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="resume.html">Resume &amp; Certs</a></li>
       </ul>
@@ -43,7 +45,7 @@
       <p class="hero-label">Senior Software Engineer · Transitioning to Cloud Engineering &amp; DevOps</p>
       <h1>Nurudeen Adeniyi</h1>
       <p class="hero-bio">
-        I'm a senior software engineer with 18+ years of experience designing and running
+        I'm a senior software engineer with 10+ years of experience designing and running
         distributed backends in .NET, and I'm transitioning into cloud engineering and DevOps
         on AWS. This site documents what I'm learning through hands-on cloud and DevOps projects:
         the decisions and tradeoffs behind each design, the problems I hit, and the core concepts
@@ -74,6 +76,7 @@
           <span class="section-category-label">AWS &amp; Cloud Engineering</span>
           <h2>Cloud Projects</h2>
         </div>
+        <a href="aws-cloud.html">See all AWS &amp; Cloud Engineering projects →</a>
       </div>
 
       <div class="card-grid">
@@ -95,6 +98,24 @@
           <a class="card-link" href="projects/s3-static-website.html">Read case study →</a>
         </div>
 
+        <!-- Serverless Web Application -->
+        <div class="card">
+          <span class="card-status card-status--built">Built</span>
+          <h3>Serverless Web Application on AWS</h3>
+          <p>
+            A static web form in Amazon S3 that sends product purchases through
+            API Gateway, Lambda and SQS into DynamoDB.
+          </p>
+          <div class="tag-row">
+            <span class="tag">S3</span>
+            <span class="tag">API Gateway</span>
+            <span class="tag">Lambda</span>
+            <span class="tag">SQS</span>
+            <span class="tag">DynamoDB</span>
+          </div>
+          <a class="card-link" href="projects/serverless-web-application.html">Read case study →</a>
+        </div>
+
       </div><!-- /card-grid -->
 
     </div>
@@ -109,6 +130,7 @@
           <span class="section-category-label">DevOps &amp; Automation</span>
           <h2>DevOps Projects</h2>
         </div>
+        <a href="devops.html">See all DevOps &amp; Automation projects →</a>
       </div>
 
       <div class="card-grid">
@@ -146,6 +168,7 @@
           <span class="section-category-label">AI &amp; Automation</span>
           <h2>AI Projects</h2>
         </div>
+        <a href="ai-automation.html">See all AI &amp; Automation projects →</a>
       </div>
 
       <div class="card-grid">
@@ -167,11 +190,25 @@
           </div>
         </div>
 
-      </div><!-- /card-grid -->
+        <div class="card">
+          <span class="card-status card-status--built">Built</span>
+          <h3>Serverless Telegram Bot on Lambda</h3>
+          <p>
+            Sales-analytics bot that answers questions from live Square data
+            using OpenAI tool calling. Runs on AWS Lambda behind API Gateway,
+            shipped as a container image with Terraform and GitHub Actions.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Lambda</span>
+            <span class="tag">API Gateway</span>
+            <span class="tag">ECR</span>
+            <span class="tag">Terraform</span>
+            <span class="tag">OpenAI</span>
+          </div>
+          <a class="card-link" href="projects/serverless-telegram-bot.html">Read case study →</a>
+        </div>
 
-      <div class="section-more">
-        <a class="resume-cta resume-cta--ghost" href="projects.html">See all projects →</a>
-      </div>
+      </div><!-- /card-grid -->
 
     </div>
   </section>

@@ -20,7 +20,9 @@ appcomplish-portfolio/
 │   ├── robots.txt
 │   ├── about.html                      # About — background and transition story
 │   ├── resume.html                     # Resume summary, LinkedIn contact + cert badges
-│   ├── projects.html                   # All projects listing
+│   ├── aws-cloud.html                  # Section page: AWS & Cloud Engineering projects
+│   ├── devops.html                     # Section page: DevOps & Automation projects
+│   ├── ai-automation.html              # Section page: AI & Automation projects
 │   ├── projects/
 │   │   ├── s3-static-website.html      # Case study: S3 static hosting
 │   │   ├── s3-cicd-pipeline.html       # Case study: CI/CD to S3 with GitHub Actions and OIDC
@@ -55,7 +57,7 @@ Only the landing page is named `index.html`; every other page has a descriptive 
    - What Would Break at 10× the Scale
    - What I'd Do Differently
 3. Add an architecture diagram to `src/assets/images/projects/<project-slug>/`
-4. Add a card to `src/projects.html` and `src/index.html`
+4. Add a card to `src/index.html` and to its section page (`src/aws-cloud.html`, `src/devops.html` or `src/ai-automation.html`)
 
 ---
 

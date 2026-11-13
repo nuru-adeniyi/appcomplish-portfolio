@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <title>DevOps &amp; Automation Projects — Nurudeen Adeniyi</title>
+  <meta name="description" content="DevOps and automation case studies: CI/CD pipelines with GitHub Actions, with the decisions and tradeoffs behind each." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <nav class="nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">Nurudeen <span>Adeniyi</span></a>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle menu">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="aws-cloud.html">AWS &amp; Cloud</a></li>
+        <li><a href="devops.html" class="active">DevOps</a></li>
+        <li><a href="ai-automation.html">AI &amp; Automation</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="resume.html">Resume &amp; Certs</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding:3rem 1.5rem 2.5rem;">
+    <div class="hero-inner">
+      <p class="hero-label">Projects</p>
+      <h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">DevOps &amp; Automation</h1>
+      <p class="hero-bio" style="font-size:1rem;">
+        Every case study here covers what I built, why I chose this approach and what the tradeoffs are.
+      </p>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="container">
+
+      <a class="back-link" href="index.html">← Home</a>
+
+      <div class="card-grid card-grid--list">
+
+        <div class="card">
+          <span class="card-status card-status--built">Built</span>
+          <h3>CI/CD Pipelines</h3>
+          <p>
+            GitHub Actions workflows across multiple projects — automated
+            deploys to AWS ECS (containerized app), S3 sync on push,
+            and per-repo pipelines that run on every commit. Built and iterated
+            on over two years across personal and side projects.
+          </p>
+          <div class="tag-row">
+            <span class="tag">GitHub Actions</span>
+            <span class="tag">CI/CD</span>
+            <span class="tag">AWS ECS</span>
+            <span class="tag">Docker</span>
+            <span class="tag">S3</span>
+          </div>
+          <a class="card-link" href="projects/s3-cicd-pipeline.html">Read case study →</a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Nurudeen Adeniyi ·
+      <a href="https://github.com/nuru-adeniyi" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nurudeen-adeniyi-06249b9" target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

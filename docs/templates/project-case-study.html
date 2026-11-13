@@ -3,8 +3,9 @@
   PROJECT CASE STUDY TEMPLATE  (copy to src/projects/<project-slug>.html)
 
   Models to match: src/projects/s3-static-website.html and src/projects/s3-cicd-pipeline.html.
-  A START block (Situation, Task, Action, Result, Takeaway) with a "Jump to START" link in the header, then five parts,
-  about 700-900 words total: Business Requirement, At a glance, Figure, Problems I Hit and How I
+  Business Requirement first (ending with a Source line), then a START block (Situation, Task, Action, Result, Takeaway) with a
+  "Jump to START" link in the header, then four more parts,
+  about 700-900 words total: At a glance, Figure, Problems I Hit and How I
   Fixed Them (omit when nothing went wrong), Design Considerations. Standard: docs/conventions.md.
   "Not available" is fine for a value you cannot find; "n/a — reason" is fine for a table row that does not apply.
   Every `TODO:` must be replaced. /review blocks pages that still contain "TODO:" or "Placeholder"
@@ -40,7 +41,9 @@
         </svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../aws-cloud.html">AWS &amp; Cloud</a></li>
+        <li><a href="../devops.html">DevOps</a></li>
+        <li><a href="../ai-automation.html">AI &amp; Automation</a></li>
         <li><a href="../about.html">About</a></li>
         <li><a href="../resume.html">Resume &amp; Certs</a></li>
       </ul>
@@ -49,7 +52,9 @@
 
   <header class="article-header">
     <div class="container--narrow">
-      <a class="back-link" href="../projects.html">← All Projects</a>
+      <a class="back-link" href="../index.html">← Home</a>
+      <!-- Pick this case study's section page: aws-cloud.html, devops.html or ai-automation.html, and set the link text to match. -->
+      <a class="back-link" href="../aws-cloud.html">← All AWS &amp; Cloud Engineering projects</a>
       <div class="tag-row"><span class="tag">TODO: AWS</span></div>
       <span class="card-status card-status--wip">In Progress</span>
       <h1>TODO: Project Name</h1>
@@ -62,6 +67,15 @@
 
   <article class="article-body">
     <div class="container--narrow">
+
+      <!-- 1. BUSINESS REQUIREMENT: start straight with the requirement ("Build a ... on ... that must ..."), no backstory, one short paragraph, then the design question. No bullets. -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>TODO: "Build a ... using ... It must ..." (own domain, no stored keys, low cost...).</p>
+        <p><strong>TODO: the design question, e.g. "How would you host a portfolio website like this?"</strong></p>
+        <!-- Source: say where the idea came from. Pick one: "My own idea to practice." | "<a href="https://learn.digitalcloud.training/courses" target="_blank" rel="noopener">Digital Cloud Training</a> lab, <lab title>." | "<a href="URL" target="_blank" rel="noopener">title</a>, a link I found to practice." -->
+        <p><strong>Source:</strong> TODO</p>
+      </div>
 
       <!-- START: one short line each, true to what was built. Situation = why it was needed; Task = the goal; Action = what I did; Result = what I can show; Takeaway = what I learned. Do not repeat the sections below, summarise them. -->
       <section id="start" aria-labelledby="start-heading">
@@ -79,13 +93,6 @@
           </table>
         </div>
       </section>
-
-      <!-- 1. BUSINESS REQUIREMENT: start straight with the requirement ("Build a ... on ... that must ..."), no backstory, one short paragraph, then the design question. No bullets. -->
-      <div class="callout">
-        <div class="callout-label">Business Requirement</div>
-        <p>TODO: "Build a ... using ... It must ..." (own domain, no stored keys, low cost...).</p>
-        <p><strong>TODO: the design question, e.g. "How would you host a portfolio website like this?"</strong></p>
-      </div>
 
       <!-- 2. AT A GLANCE: Key decision, Stack (include region), Monthly cost (estimate), Status. CI/CD pages add a Source row linking the workflow file on GitHub. -->
       <dl class="glance">

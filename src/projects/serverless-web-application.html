@@ -23,7 +23,9 @@
         </svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../aws-cloud.html" class="active">AWS &amp; Cloud</a></li>
+        <li><a href="../devops.html">DevOps</a></li>
+        <li><a href="../ai-automation.html">AI &amp; Automation</a></li>
         <li><a href="../about.html">About</a></li>
         <li><a href="../resume.html">Resume &amp; Certs</a></li>
       </ul>
@@ -32,7 +34,8 @@
 
   <header class="article-header">
     <div class="container--narrow">
-      <a class="back-link" href="../projects.html">← All Projects</a>
+      <a class="back-link" href="../index.html">← Home</a>
+      <a class="back-link" href="../aws-cloud.html">← All AWS &amp; Cloud Engineering projects</a>
       <div class="tag-row">
         <span class="tag">AWS</span>
         <span class="tag">S3</span>
@@ -53,6 +56,19 @@
   <article class="article-body">
     <div class="container--narrow">
 
+      <!-- 1. Business Requirement -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>
+          Build a serverless web application on AWS where a static web form hosted in Amazon S3 sends
+          product-purchase details through Amazon API Gateway and AWS Lambda into an Amazon SQS queue,
+          and a second Lambda function writes each one to an Amazon DynamoDB table. It must need no
+          servers to manage and keep the web form, queue and database as separate pieces.
+        </p>
+        <p><strong>How would you accept form submissions from a website without running a server?</strong></p>
+        <p><strong>Source:</strong> <a href="https://learn.digitalcloud.training/courses" target="_blank" rel="noopener">Digital Cloud Training</a> lab, "Build a Serverless Web Application" (Cloud Mastery Bootcamp).</p>
+      </div>
+
       <!-- START: Situation, Task, Action, Result, Takeaway -->
       <section id="start" aria-labelledby="start-heading">
         <h2 id="start-heading">START</h2>
@@ -69,18 +85,6 @@
           </table>
         </div>
       </section>
-
-      <!-- 1. Business Requirement -->
-      <div class="callout">
-        <div class="callout-label">Business Requirement</div>
-        <p>
-          Build a serverless web application on AWS where a static web form hosted in Amazon S3 sends
-          product-purchase details through Amazon API Gateway and AWS Lambda into an Amazon SQS queue,
-          and a second Lambda function writes each one to an Amazon DynamoDB table. It must need no
-          servers to manage and keep the web form, queue and database as separate pieces.
-        </p>
-        <p><strong>How would you accept form submissions from a website without running a server?</strong></p>
-      </div>
 
       <!-- 2. At a glance -->
       <dl class="glance">
@@ -166,7 +170,7 @@
         <div class="callout-label">Related</div>
         Another API Gateway and Lambda design is the
         <a href="serverless-telegram-bot.html">Serverless Telegram Bot</a>.
-        <a href="../projects.html">See all projects →</a>
+        <a href="../aws-cloud.html">See all AWS &amp; Cloud Engineering projects →</a>
       </div>
 
     </div>

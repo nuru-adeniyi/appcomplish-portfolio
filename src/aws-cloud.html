@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <title>Projects — Nurudeen Adeniyi</title>
-  <meta name="description" content="Cloud engineering projects documenting real AWS builds, decisions, and tradeoffs." />
+  <title>AWS &amp; Cloud Engineering Projects — Nurudeen Adeniyi</title>
+  <meta name="description" content="AWS and cloud engineering case studies: static hosting and a serverless web application, with the decisions and tradeoffs behind each." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -23,7 +23,9 @@
         </svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="projects.html" class="active">Projects</a></li>
+        <li><a href="aws-cloud.html" class="active">AWS &amp; Cloud</a></li>
+        <li><a href="devops.html">DevOps</a></li>
+        <li><a href="ai-automation.html">AI &amp; Automation</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="resume.html">Resume &amp; Certs</a></li>
       </ul>
@@ -32,11 +34,10 @@
 
   <section class="hero" style="padding:3rem 1.5rem 2.5rem;">
     <div class="hero-inner">
-      <p class="hero-label">All Projects</p>
-      <h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">What I've Built</h1>
+      <p class="hero-label">Projects</p>
+      <h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">AWS &amp; Cloud Engineering</h1>
       <p class="hero-bio" style="font-size:1rem;">
-        Every project here follows the same structure: what I built, why I chose this approach,
-        what the alternatives were, what the tradeoffs are, and how I'd scale it.
+        Every case study here covers what I built, why I chose this approach and what the tradeoffs are.
       </p>
     </div>
   </section>
@@ -44,11 +45,9 @@
   <section class="page">
     <div class="container">
 
-      <!-- AWS / Cloud section -->
-      <div class="section-header">
-        <h2>☁️ AWS &amp; Cloud Engineering</h2>
-      </div>
-      <div class="card-grid">
+      <a class="back-link" href="index.html">← Home</a>
+
+      <div class="card-grid card-grid--list">
 
         <div class="card">
           <span class="card-status card-status--built">Built</span>
@@ -81,64 +80,6 @@
             <span class="tag">DynamoDB</span>
           </div>
           <a class="card-link" href="projects/serverless-web-application.html">Read case study →</a>
-        </div>
-
-
-      </div>
-
-      <hr class="divider" />
-
-      <!-- DevOps / IaC section -->
-      <div class="section-header mt-4">
-        <h2>⚙️ DevOps &amp; Automation</h2>
-      </div>
-      <div class="card-grid">
-
-        <div class="card">
-          <span class="card-status card-status--built">Built</span>
-          <h3>CI/CD Pipelines</h3>
-          <p>
-            GitHub Actions workflows across multiple projects — automated
-            deploys to AWS ECS (containerized app), S3 sync on push,
-            and per-repo pipelines that run on every commit. Built and iterated
-            on over two years across personal and side projects.
-          </p>
-          <div class="tag-row">
-            <span class="tag">GitHub Actions</span>
-            <span class="tag">CI/CD</span>
-            <span class="tag">AWS ECS</span>
-            <span class="tag">Docker</span>
-            <span class="tag">S3</span>
-          </div>
-          <a class="card-link" href="projects/s3-cicd-pipeline.html">Read case study →</a>
-        </div>
-
-      </div>
-
-      <hr class="divider" />
-
-      <!-- AI / Automation section -->
-      <div class="section-header mt-4">
-        <h2>🤖 AI &amp; Automation</h2>
-      </div>
-      <div class="card-grid">
-
-        <div class="card">
-          <span class="card-status card-status--built">Built</span>
-          <h3>Serverless Telegram Bot on Lambda</h3>
-          <p>
-            Sales-analytics bot that answers questions from live Square data
-            using OpenAI tool calling. Runs on AWS Lambda behind API Gateway,
-            shipped as a container image with Terraform and GitHub Actions.
-          </p>
-          <div class="tag-row">
-            <span class="tag">Lambda</span>
-            <span class="tag">API Gateway</span>
-            <span class="tag">ECR</span>
-            <span class="tag">Terraform</span>
-            <span class="tag">OpenAI</span>
-          </div>
-          <a class="card-link" href="projects/serverless-telegram-bot.html">Read case study →</a>
         </div>
 
       </div>
