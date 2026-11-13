@@ -23,7 +23,8 @@ appcomplish-portfolio/
 │   ├── projects.html                   # All projects listing
 │   ├── projects/
 │   │   ├── s3-static-website.html      # Case study: S3 static hosting
-│   │   └── s3-cicd-pipeline.html       # Case study: CI/CD to S3 with GitHub Actions and OIDC
+│   │   ├── s3-cicd-pipeline.html       # Case study: CI/CD to S3 with GitHub Actions and OIDC
+│   │   └── serverless-web-application.html  # Case study: S3 form to API Gateway, Lambda, SQS, DynamoDB
 │   └── assets/
 │       ├── css/style.css               # Shared stylesheet
 │       ├── js/main.js                  # Nav toggle, active link
