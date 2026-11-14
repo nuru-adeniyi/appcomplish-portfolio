@@ -96,9 +96,10 @@
 
       <!-- 3. Figure -->
       <div class="diagram-box">
-        <div class="diagram-slot" role="img" aria-label="AWS architecture diagram, not drawn yet">AWS architecture diagram: coming soon</div>
+        <img src="../assets/images/projects/serverless-web-application/architecture.svg" width="900" height="626"
+             alt="Architecture of the serverless web application in one AWS account, Region us-east-1. 1: a visitor's browser loads the web form from an Amazon S3 static website. 2: the browser sends a PUT request to /productpurchase on Amazon API Gateway. 3: API Gateway invokes the AWS Lambda function productPurchasesSendDataToQueue. 4: that function puts a message in the Amazon SQS queue ProductPurchasesDataQueue. 5: the queue's trigger invokes the AWS Lambda function productPurchasesDataHandler. 6: that function writes the item to the Amazon DynamoDB table ProductPurchases. 7: API Gateway returns a response to the browser." />
       </div>
-      <p class="diagram-caption">Figure 1 — The browser loads the form from the Amazon S3 website, which calls Amazon API Gateway. The first AWS Lambda function puts each purchase in an Amazon SQS queue, and a second function, started by the queue, writes it to Amazon DynamoDB. The queue sits between them so the two steps stay separate.</p>
+      <p class="diagram-caption">Figure 1 — The queue sits between the two AWS Lambda functions, so receiving a form and writing to Amazon DynamoDB are separate steps. The browser calls the API directly, which is why the API needs CORS and a <code>PUT</code> method on <code>/productpurchase</code> (Problem 1).</p>
       <p><strong>Proof:</strong> submitting the form added the item to the <code>ProductPurchases</code> table. The five sample message files, sent from AWS CloudShell with <code>aws sqs send-message</code>, all appeared in the table with no manual step between the queue and the table.</p>
 
       <details class="services">
