@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <title>Highly Available Website on EC2 — Nurudeen Adeniyi</title>
+  <meta name="description" content="Case study: a highly available website on Amazon EC2 behind an Application Load Balancer and Auto Scaling group in a custom VPC, with a Lambda and DynamoDB latest-news service. Decisions, cost and the five problems I hit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+  <nav class="nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Nurudeen <span>Adeniyi</span></a>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle menu">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../aws-cloud.html" class="active">AWS &amp; Cloud</a></li>
+        <li><a href="../devops.html">DevOps</a></li>
+        <li><a href="../ai-automation.html">AI &amp; Automation</a></li>
+        <li><a href="../about.html">About</a></li>
+        <li><a href="../resume.html">Resume &amp; Certs</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="article-header">
+    <div class="container--narrow">
+      <a class="back-link" href="../index.html">← Home</a>
+      <a class="back-link" href="../aws-cloud.html">← All AWS &amp; Cloud Engineering projects</a>
+      <div class="tag-row">
+        <span class="tag">AWS</span>
+        <span class="tag">VPC</span>
+        <span class="tag">EC2</span>
+        <span class="tag">ALB</span>
+        <span class="tag">Auto Scaling</span>
+        <span class="tag">Lambda</span>
+        <span class="tag">DynamoDB</span>
+      </div>
+      <span class="card-status card-status--built">Built</span>
+      <h1>Highly Available Website on EC2</h1>
+      <div class="article-meta">
+        <span>Built: November 2026</span>
+        <a href="#start">Jump to START ↓</a>
+      </div>
+    </div>
+  </header>
+
+  <article class="article-body">
+    <div class="container--narrow">
+
+      <!-- 1. Business Requirement -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>
+          Build a portfolio website on AWS that runs on Amazon EC2 instances in private subnets of a custom
+          Amazon VPC, spread across two Availability Zones behind an Application Load Balancer, and that
+          shows a view counter and a "latest news" feed kept in Amazon DynamoDB, with AWS Lambda updating the feed on a schedule, and a contact form that sends an email notification through Amazon SNS.
+          Visitors must reach it only through the load balancer, and failed instances must be replaced
+          automatically.
+        </p>
+        <p><strong>How would you host a web server so it survives losing an instance or an Availability Zone, and keep the servers off the public internet?</strong></p>
+        <p><strong>Source:</strong> <a href="https://learn.digitalcloud.training/courses" target="_blank" rel="noopener">Digital Cloud Training</a> lab, "SAA1 Capstone Project 1: AWS Portfolio Website".</p>
+      </div>
+
+      <!-- START: Situation, Task, Action, Result, Takeaway -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>I wanted to practice VPC networking and high availability end to end, plus Lambda and DynamoDB microservices, using AWS services only.</td></tr>
+              <tr><td><strong>Task</strong></td><td>Serve a portfolio website from private Amazon EC2 instances across two Availability Zones, with a latest-news feed backed by Amazon DynamoDB.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Launched one server from a provided Amazon Machine Image (AMI), deployed the course's three AWS CloudFormation templates for the Lambda microservices and wired them into the site, saved it as a custom AMI, then built the VPC, Application Load Balancer and Auto Scaling group around it in 13 steps. I skipped the blog service.</td></tr>
+              <tr><td><strong>Result</strong></td><td>The website opens on the load balancer's DNS name over HTTP, and the view counter and latest-news feed load through Lambda Function URLs.</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>A security group rule can name another security group as its source, so ask which one the traffic really comes from before debugging timeouts.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2. At a glance -->
+      <dl class="glance">
+        <div><dt>Key decision</dt><dd>Servers in private subnets, reachable only through an <a href="https://aws.amazon.com/elasticloadbalancing/application-load-balancer/" target="_blank" rel="noopener">Application Load Balancer</a> in public subnets</dd></div>
+        <div><dt>Stack</dt><dd><a href="https://aws.amazon.com/vpc/" target="_blank" rel="noopener">Amazon VPC</a>, <a href="https://aws.amazon.com/ec2/" target="_blank" rel="noopener">Amazon EC2</a>, <a href="https://aws.amazon.com/ec2/autoscaling/" target="_blank" rel="noopener">EC2 Auto Scaling</a>, Application Load Balancer, <a href="https://aws.amazon.com/lambda/" target="_blank" rel="noopener">AWS Lambda</a>, <a href="https://aws.amazon.com/dynamodb/" target="_blank" rel="noopener">Amazon DynamoDB</a>, <a href="https://aws.amazon.com/eventbridge/" target="_blank" rel="noopener">Amazon EventBridge</a>, <a href="https://aws.amazon.com/sns/" target="_blank" rel="noopener">Amazon SNS</a>, <a href="https://aws.amazon.com/cloudformation/" target="_blank" rel="noopener">AWS CloudFormation</a>, in us-east-1</dd></div>
+        <div><dt>Monthly cost</dt><dd>About $50 or more while running (estimate)</dd></div>
+        <div><dt>Status</dt><dd>Built and tested over HTTP only, in the AWS console</dd></div>
+      </dl>
+
+      <!-- 3. Figure -->
+      <div class="diagram-box">
+        <svg viewBox="0 0 760 584" role="img" aria-label="Web tier: a visitor's browser sends an HTTP request to the internet-facing Application Load Balancer in the public subnets. The load balancer forwards it to Amazon EC2 instances in the Auto Scaling group, in private subnets in two Availability Zones. The instances reach the internet only outbound, through a NAT Gateway in a public subnet. Latest news: JavaScript in the browser calls a Lambda Function URL, which runs the UpdateWebpageFunction AWS Lambda function, which reads the Amazon DynamoDB table. Scheduled update: an Amazon EventBridge schedule runs the RSS Lambda function, which writes to the same DynamoDB table. View counter: JavaScript in the browser calls a second Lambda Function URL, which runs the Increment View Counter function, which updates the view count in DynamoDB. Contact form: the browser calls a third Lambda Function URL, which runs the Contact Form function, which publishes to an Amazon SNS topic that sends an email notification." style="width:100%;height:auto;">
+          <defs>
+            <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0L10 5L0 10z" fill="var(--text-muted)"/>
+            </marker>
+          </defs>
+          <g font-family="Inter, system-ui, sans-serif" font-size="13" text-anchor="middle">
+            <text x="6" y="22" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">WEB TIER (CUSTOM VPC, TWO AVAILABILITY ZONES)</text>
+            <g stroke="var(--border)" fill="var(--bg-subtle)">
+              <rect x="6" y="34" width="110" height="64" rx="8"/>
+              <rect x="150" y="34" width="170" height="64" rx="8"/>
+              <rect x="354" y="34" width="190" height="64" rx="8"/>
+              <rect x="578" y="34" width="176" height="64" rx="8"/>
+            </g>
+            <g fill="var(--text)" font-weight="600">
+              <text x="61" y="60">Visitor</text><text x="235" y="60">Application LB</text><text x="449" y="60">EC2 instances</text><text x="666" y="60">NAT Gateway</text>
+            </g>
+            <g fill="var(--text-muted)" font-size="11.5">
+              <text x="61" y="78">HTTP</text><text x="235" y="78">public subnets, HTTP 80</text><text x="449" y="78">Auto Scaling, private subnets</text><text x="666" y="78">outbound only</text>
+            </g>
+            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
+              <line x1="118" y1="66" x2="146" y2="66"/><line x1="322" y1="66" x2="350" y2="66"/><line x1="546" y1="66" x2="574" y2="66"/>
+            </g>
+            <text x="6" y="140" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">LATEST NEWS (SERVERLESS)</text>
+            <g stroke="var(--border)" fill="var(--bg-subtle)">
+              <rect x="6" y="152" width="140" height="64" rx="8"/>
+              <rect x="180" y="152" width="140" height="64" rx="8"/>
+              <rect x="354" y="152" width="190" height="64" rx="8"/>
+              <rect x="578" y="152" width="176" height="64" rx="8"/>
+            </g>
+            <g fill="var(--text)" font-weight="600">
+              <text x="76" y="178">Browser</text><text x="250" y="178">Function URL</text><text x="449" y="178">UpdateWebpageFunction</text><text x="666" y="178">DynamoDB</text>
+            </g>
+            <g fill="var(--text-muted)" font-size="11.5">
+              <text x="76" y="196">website JavaScript</text><text x="250" y="196">public HTTPS endpoint</text><text x="449" y="196">Lambda, reads records</text><text x="666" y="196">latest-news table</text>
+            </g>
+            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
+              <line x1="148" y1="184" x2="176" y2="184"/><line x1="322" y1="184" x2="350" y2="184"/><line x1="546" y1="184" x2="574" y2="184"/>
+            </g>
+            <text x="6" y="258" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">SCHEDULED UPDATE</text>
+            <g stroke="var(--border)" fill="var(--bg-subtle)">
+              <rect x="6" y="270" width="170" height="64" rx="8"/>
+              <rect x="210" y="270" width="170" height="64" rx="8"/>
+              <rect x="414" y="270" width="176" height="64" rx="8"/>
+            </g>
+            <g fill="var(--text)" font-weight="600">
+              <text x="91" y="296">EventBridge</text><text x="295" y="296">RSS Lambda</text><text x="502" y="296">DynamoDB</text>
+            </g>
+            <g fill="var(--text-muted)" font-size="11.5">
+              <text x="91" y="314">schedule</text><text x="295" y="314">fetches the RSS feed</text><text x="502" y="314">same table, new records</text>
+            </g>
+            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
+              <line x1="178" y1="302" x2="206" y2="302"/><line x1="382" y1="302" x2="410" y2="302"/>
+            </g>
+            <text x="6" y="376" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">VIEW COUNTER</text>
+            <g stroke="var(--border)" fill="var(--bg-subtle)">
+              <rect x="6" y="388" width="140" height="64" rx="8"/>
+              <rect x="180" y="388" width="140" height="64" rx="8"/>
+              <rect x="354" y="388" width="190" height="64" rx="8"/>
+              <rect x="578" y="388" width="176" height="64" rx="8"/>
+            </g>
+            <g fill="var(--text)" font-weight="600">
+              <text x="76" y="414">Browser</text><text x="250" y="414">Function URL</text><text x="449" y="414">Increment View Counter</text><text x="666" y="414">DynamoDB</text>
+            </g>
+            <g fill="var(--text-muted)" font-size="11.5">
+              <text x="76" y="432">website JavaScript</text><text x="250" y="432">public HTTPS endpoint</text><text x="449" y="432">Lambda, adds one view</text><text x="666" y="432">view count</text>
+            </g>
+            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
+              <line x1="148" y1="420" x2="176" y2="420"/><line x1="322" y1="420" x2="350" y2="420"/><line x1="546" y1="420" x2="574" y2="420"/>
+            </g>
+            <text x="6" y="494" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">CONTACT FORM</text>
+            <g stroke="var(--border)" fill="var(--bg-subtle)">
+              <rect x="6" y="506" width="130" height="64" rx="8"/>
+              <rect x="166" y="506" width="130" height="64" rx="8"/>
+              <rect x="326" y="506" width="140" height="64" rx="8"/>
+              <rect x="496" y="506" width="120" height="64" rx="8"/>
+              <rect x="646" y="506" width="108" height="64" rx="8"/>
+            </g>
+            <g fill="var(--text)" font-weight="600">
+              <text x="71" y="532">Browser</text><text x="231" y="532">Function URL</text><text x="396" y="532">Contact Form</text><text x="556" y="532">SNS topic</text><text x="700" y="532">Email</text>
+            </g>
+            <g fill="var(--text-muted)" font-size="11.5">
+              <text x="71" y="550">form submit</text><text x="231" y="550">public HTTPS</text><text x="396" y="550">Lambda function</text><text x="556" y="550">publishes message</text><text x="700" y="550">notification</text>
+            </g>
+            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
+              <line x1="138" y1="538" x2="162" y2="538"/><line x1="298" y1="538" x2="322" y2="538"/><line x1="468" y1="538" x2="492" y2="538"/><line x1="618" y1="538" x2="642" y2="538"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <p class="diagram-caption">Figure 1 — Visitors reach only the load balancer, so the Amazon EC2 instances can sit in private subnets and still be replaced automatically. The NAT Gateway is outbound-only: it gives those private instances internet access without letting the internet in. The news feed bypasses the servers: the browser calls a Lambda <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html" target="_blank" rel="noopener">Function URL</a>, so the Lambda and DynamoDB pieces change separately from the web servers.</p>
+      <p><strong>Proof:</strong> the load balancer's DNS name returns the website over HTTP, the view counter goes up on each load, and the target group shows 2 of 2 targets healthy. A test run of the RSS function returned 200 "News updated successfully", and <code>UpdateWebpageFunction</code> returned the 10 newest posts from DynamoDB.</p>
+
+      <details class="services">
+        <summary>AWS services in this design and what each does</summary>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Service</th><th>Purpose here</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://aws.amazon.com/ec2/" target="_blank" rel="noopener">Amazon EC2</a> and an <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html" target="_blank" rel="noopener">AMI</a></td><td>The web server. I started from a provided community AMI that already held the site's HTML, CSS and PNG files, then saved my working server as a custom AMI.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/vpc/" target="_blank" rel="noopener">Amazon VPC</a></td><td>The private network: two public and two private subnets across two Availability Zones.</td></tr>
+              <tr><td><a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html" target="_blank" rel="noopener">Internet Gateway</a> and <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html" target="_blank" rel="noopener">route tables</a></td><td>The public route table sends <code>0.0.0.0/0</code> to the Internet Gateway; the private route table sends it to the NAT Gateway.</td></tr>
+              <tr><td><a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html" target="_blank" rel="noopener">NAT Gateway</a></td><td>In a public subnet; gives the private instances outbound internet access only.</td></tr>
+              <tr><td><a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html" target="_blank" rel="noopener">Security groups</a></td><td>The ALB security group allows HTTP 80 from the internet; <code>portfolio-web-sg</code> allows HTTP 80 only from the ALB security group.</td></tr>
+              <tr><td><a href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/launch-templates.html" target="_blank" rel="noopener">Launch template</a> and <a href="https://aws.amazon.com/ec2/autoscaling/" target="_blank" rel="noopener">Auto Scaling group</a></td><td>The template holds the custom AMI and web security group. The group launches instances from it in the private subnets and registers them with the target group.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/elasticloadbalancing/application-load-balancer/" target="_blank" rel="noopener">Application Load Balancer</a> and <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html" target="_blank" rel="noopener">target group</a></td><td>Internet-facing, in the public subnets, with an HTTP listener that forwards to the target group (HTTP 80).</td></tr>
+              <tr><td><a href="https://aws.amazon.com/lambda/" target="_blank" rel="noopener">AWS Lambda</a></td><td>Four small functions, each started by a Function URL or a schedule: one increments the view counter, <code>UpdateWebpageFunction</code> reads the news records, the RSS function fetches new items, and the contact form function publishes the message to SNS.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/dynamodb/" target="_blank" rel="noopener">Amazon DynamoDB</a></td><td>Two tables: <code>AWSNews</code> holds the news posts (partition key <code>Date</code>, sort key <code>Title</code>), and a second holds the view count.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/eventbridge/" target="_blank" rel="noopener">Amazon EventBridge</a></td><td>A daily schedule (09:00 UTC) that runs the RSS Lambda function.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/sns/" target="_blank" rel="noopener">Amazon SNS</a></td><td>A topic that receives each contact form message and sends it on as an email notification.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/cloudformation/" target="_blank" rel="noopener">AWS CloudFormation</a></td><td>Deployed the course's three templates (view counter, latest news, contact form), one stack each. Each creates its function, IAM role and table or topic, but no Function URL.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <!-- 4. Problems -->
+      <h2 id="problems">Problems I Hit and How I Fixed Them</h2>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 1</div>
+        <p><strong>The first EC2 website would not load</strong><br />
+          <strong>Trying to:</strong> open the website on the first Amazon EC2 instance I launched from the provided AMI.<br />
+          <strong>What happened:</strong> the browser could not connect.<br />
+          <strong>Why:</strong> the AMI already held the HTML, CSS and PNG files, so the site was fine. The instance's security group did not allow inbound HTTP on port 80, so the request never reached the web server.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li><strong>EC2</strong> → <strong>Instances</strong> → select the instance → <strong>Security</strong> tab → click its security group.</li>
+          <li><strong>Edit inbound rules</strong> → <strong>Add rule</strong>: type <strong>HTTP</strong>, port 80 → <strong>Save rules</strong>, then reload the site.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 2</div>
+        <p><strong>The Latest News function had no URL</strong><br />
+          <strong>Trying to:</strong> show the news records on the website.<br />
+          <strong>What happened:</strong> nothing loaded, although <code>UpdateWebpageFunction</code> could read the DynamoDB records.<br />
+          <strong>Why:</strong> the website's JavaScript runs in the visitor's browser and needs an address to call, and the function had no Function URL. The course's CloudFormation template creates the function but not a Function URL.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li><strong>Lambda</strong> → <strong>Functions</strong> → <code>UpdateWebpageFunction</code> → <strong>Configuration</strong> → <strong>Function URL</strong> → <strong>Create function URL</strong>.</li>
+          <li>Choose auth type <strong>NONE</strong> so the browser can call it, then use the URL in the website's JavaScript.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 3</div>
+        <p><strong>The Function URL returned 403</strong><br />
+          <strong>Trying to:</strong> call the new Function URL from the browser.<br />
+          <strong>What happened:</strong> a 403 Forbidden response.<br />
+          <strong>Why:</strong> the URL existed, but a public Function URL needs two permissions in the function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html" target="_blank" rel="noopener">resource-based policy</a>, <code>lambda:InvokeFunctionUrl</code> and <code>lambda:InvokeFunction</code>, and one or both were missing.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li><strong>Lambda</strong> → <code>UpdateWebpageFunction</code> → <strong>Configuration</strong> → <strong>Permissions</strong> → <strong>Resource-based policy statements</strong>.</li>
+          <li>Check that statements allow both <code>lambda:InvokeFunctionUrl</code> and <code>lambda:InvokeFunction</code> for public access; add whichever is missing with <strong>Add permissions</strong>.</li>
+          <li>Call the URL again.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 4</div>
+        <p><strong>The private subnets had no route to the internet</strong><br />
+          <strong>Trying to:</strong> give the instances in the private subnets outbound internet access.<br />
+          <strong>What happened:</strong> the private route table existed, but its default route (<code>0.0.0.0/0</code>) had nowhere to point.<br />
+          <strong>Why:</strong> I had not created the NAT Gateway the route needs as its target.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li><strong>VPC</strong> → <strong>NAT gateways</strong> → <strong>Create NAT gateway</strong>: pick a public subnet and let it allocate an Elastic IP automatically.</li>
+          <li><strong>VPC</strong> → <strong>Route tables</strong> → the private route table → <strong>Routes</strong> → <strong>Edit routes</strong>: <code>0.0.0.0/0</code> → the NAT Gateway.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 5</div>
+        <p><strong>The target group timed out</strong><br />
+          <strong>Trying to:</strong> get the instances healthy in the load balancer's target group.<br />
+          <strong>What happened:</strong> the health checks timed out.<br />
+          <strong>Why:</strong> on the instance's <strong>Security</strong> tab, the inbound port-80 rule showed <code>portfolio-web-sg</code> itself as the source. Traffic from the load balancer comes from the ALB security group, so it never matched the rule.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li><strong>EC2</strong> → <strong>Security Groups</strong> → <code>portfolio-web-sg</code> → <strong>Inbound rules</strong> → <strong>Edit inbound rules</strong>.</li>
+          <li>On the HTTP 80 rule, change <strong>Source</strong> from <code>portfolio-web-sg</code> to the ALB security group → <strong>Save rules</strong>.</li>
+          <li>Wait for the targets to show <strong>healthy</strong>, then open the ALB's DNS name.</li>
+        </ol>
+        <p><strong>Lesson:</strong> in a security group rule the source says who may connect, so for a load-balanced server it must be the load balancer's group.</p>
+      </div>
+
+      <!-- 5. Design Considerations (includes cost) -->
+      <h2>Design Considerations</h2>
+      <div class="table-wrap">
+        <table class="cost-table design-table">
+          <thead><tr><th>Category</th><th>Decision</th><th>How I'd explain it</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Requirements &amp; workload</td><td>A public website that must stay up if an instance or Availability Zone fails, plus a news feed that updates itself.</td><td>"The site has to keep running if one server or one zone is lost."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Scalability &amp; performance</td><td>An Auto Scaling group launches identical servers from one launch template behind the load balancer. I set its desired capacity to 2. Load not tested.</td><td>"Every server comes from the same template, I run two, and I have not load-tested it."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Availability &amp; fault tolerance</td><td>Subnets and the load balancer span two Availability Zones, and the Auto Scaling group launches into both private subnets with the EC2 and ELB health check types on, so it can replace an instance the load balancer marks unhealthy. There is one NAT Gateway, in one public subnet, so it is a single point for outbound traffic.</td><td>"Two zones and automatic replacement cover the servers, but the one NAT Gateway is still a single point."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Data &amp; consistency</td><td>News records live in DynamoDB, not on the servers, so replacing an instance loses nothing. A daily EventBridge schedule runs the RSS function, which writes the 10 newest posts to the <code>AWSNews</code> table, and <code>UpdateWebpageFunction</code> reads them.</td><td>"The servers hold no data, so replacing one loses nothing."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Security</td><td>Instances are in private subnets. <code>portfolio-web-sg</code> accepts HTTP only from the ALB security group, not from the internet (<a href="#problems">Problem 5</a>). The Function URLs use auth type NONE, so anyone can call them. Each Lambda function has its own IAM role, limited to its own table or SNS topic. This build is HTTP on port 80 only, with no HTTPS or custom domain; the <a href="s3-static-website.html">S3 case study</a> covers those.</td><td>"Only the load balancer can reach the servers and each function has its own narrow role, but the Function URLs are public and this build is HTTP only."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Observability</td><td>The target group's health checks show whether instances are healthy. No alarms or dashboards were set up.</td><td>—</td><td><span class="pill pill--na">Not addressed yet</span></td></tr>
+            <tr><td>Deployment &amp; DevOps</td><td>The three Lambda microservices were deployed from the course's CloudFormation templates, one stack each. The VPC, load balancer and Auto Scaling group were built by hand in the AWS console, in order, testing as I went. A custom AMI and launch template make every server identical.</td><td>"The microservices came from templates, I built the network by hand, and the AMI keeps every server the same."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr class="is-best"><td>Cost &amp; trade-offs</td><td>About $50 or more a month while running (estimate): the NAT Gateway (about $33) and the load balancer (about $16) bill by the hour, plus the EC2 instances. Lambda, DynamoDB, EventBridge and SNS cost almost nothing at this size. Other AWS options: Amazon S3 with CloudFront, under $1 (<a href="s3-static-website.html">my S3 case study</a>), but it has no servers to learn from; one EC2 instance in a public subnet, cheaper but a single point of failure. Sources:
+              <a href="https://aws.amazon.com/vpc/pricing/" target="_blank" rel="noopener">NAT Gateway</a> ·
+              <a href="https://aws.amazon.com/elasticloadbalancing/pricing/" target="_blank" rel="noopener">Load Balancing</a> ·
+              <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2</a> ·
+              <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="noopener">Lambda</a> ·
+              <a href="https://aws.amazon.com/dynamodb/pricing/" target="_blank" rel="noopener">DynamoDB</a> ·
+              <a href="https://aws.amazon.com/eventbridge/pricing/" target="_blank" rel="noopener">EventBridge</a> ·
+              <a href="https://aws.amazon.com/sns/pricing/" target="_blank" rel="noopener">SNS</a> ·
+              <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a></td><td>"The NAT Gateway and load balancer cost the most, because they bill every hour."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout" style="margin-top:2rem;">
+        <div class="callout-label">Related</div>
+        The same kind of site on no servers is the
+        <a href="s3-static-website.html">S3 Static Website Hosting</a> case study.
+        <a href="../aws-cloud.html">See all AWS &amp; Cloud Engineering projects →</a>
+      </div>
+
+    </div>
+  </article>
+
+  <footer>
+    <p>
+      Nurudeen Adeniyi ·
+      <a href="https://github.com/nuru-adeniyi" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nurudeen-adeniyi-06249b9" target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

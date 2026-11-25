@@ -26,7 +26,8 @@ appcomplish-portfolio/
 │   ├── projects/
 │   │   ├── s3-static-website.html      # Case study: S3 static hosting
 │   │   ├── s3-cicd-pipeline.html       # Case study: CI/CD to S3 with GitHub Actions and OIDC
-│   │   └── serverless-web-application.html  # Case study: S3 form to API Gateway, Lambda, SQS, DynamoDB
+│   │   ├── serverless-web-application.html  # Case study: S3 form to API Gateway, Lambda, SQS, DynamoDB
+│   │   └── ec2-highly-available-website.html  # Case study: EC2 behind ALB + Auto Scaling in a custom VPC, Lambda + DynamoDB news
 │   └── assets/
 │       ├── css/style.css               # Shared stylesheet
 │       ├── js/main.js                  # Nav toggle, active link
