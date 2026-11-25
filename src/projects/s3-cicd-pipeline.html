@@ -23,7 +23,9 @@
         </svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../aws-cloud.html">AWS &amp; Cloud</a></li>
+        <li><a href="../devops.html" class="active">DevOps</a></li>
+        <li><a href="../ai-automation.html">AI &amp; Automation</a></li>
         <li><a href="../about.html">About</a></li>
         <li><a href="../resume.html">Resume &amp; Certs</a></li>
       </ul>
@@ -32,7 +34,8 @@
 
   <header class="article-header">
     <div class="container--narrow">
-      <a class="back-link" href="../projects.html">← All Projects</a>
+      <a class="back-link" href="../index.html">← Home</a>
+      <a class="back-link" href="../devops.html">← All DevOps &amp; Automation projects</a>
       <div class="tag-row">
         <span class="tag">GitHub Actions</span>
         <span class="tag">OIDC</span>
@@ -52,6 +55,19 @@
   <article class="article-body">
     <div class="container--narrow">
 
+      <!-- 1. Business Requirement -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>
+          Deploy this static website to Amazon S3 automatically with GitHub Actions on every approved
+          change (CI/CD, short for continuous integration and continuous delivery). It must use no stored
+          AWS keys, show a preview before anything changes, limit access to one bucket and clear the
+          CloudFront cache so changes show.
+        </p>
+        <p><strong>How would you deploy a static website like this?</strong></p>
+        <p><strong>Source:</strong> My own idea to practice.</p>
+      </div>
+
       <!-- START: Situation, Task, Action, Result, Takeaway -->
       <section id="start" aria-labelledby="start-heading">
         <h2 id="start-heading">START</h2>
@@ -68,18 +84,6 @@
           </table>
         </div>
       </section>
-
-      <!-- 1. Business Requirement -->
-      <div class="callout">
-        <div class="callout-label">Business Requirement</div>
-        <p>
-          Deploy this static website to Amazon S3 automatically with GitHub Actions on every approved
-          change (CI/CD, short for continuous integration and continuous delivery). It must use no stored
-          AWS keys, show a preview before anything changes, limit access to one bucket and clear the
-          CloudFront cache so changes show.
-        </p>
-        <p><strong>How would you deploy a static website like this?</strong></p>
-      </div>
 
       <!-- 2. At a glance -->
       <dl class="glance">
@@ -213,20 +217,20 @@
       <h2>Design Considerations</h2>
       <div class="table-wrap">
         <table class="cost-table design-table">
-          <thead><tr><th>Category</th><th>Decision</th><th>Status</th></tr></thead>
+          <thead><tr><th>Category</th><th>Decision</th><th>How I'd explain it</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>Requirements &amp; workload</td><td>One maintainer, a few merges a week, one repository. A pull request merging into <code>main</code> publishes <code>src/</code>.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
-            <tr><td>Scalability &amp; performance</td><td>One deploy at a time. <a href="https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html" target="_blank" rel="noopener"><code>aws s3 sync</code></a> re-uploads every file on each run, which is fine for a small site.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
-            <tr><td>Availability &amp; fault tolerance</td><td>The site keeps serving if the pipeline is down, and a repository variable pauses deploys. Rolling back by reverting the commit is untested. The pipeline depends on GitHub.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
-            <tr><td>Data &amp; consistency</td><td>n/a — static files only; Git is the source of truth.</td><td><span class="pill pill--na">n/a</span></td></tr>
-            <tr><td>Security</td><td>An OIDC role instead of stored keys: a leaked key works until someone notices, while an OIDC login expires in about an hour. The role trusts only this repository, the <code>production</code> environment and <code>main</code>, and reaches one bucket. It can also clear the cache of one CloudFront distribution.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
-            <tr><td>Observability</td><td>Each run logs every upload and delete. Failure alerts are missing.</td><td><span class="pill pill--na">Not addressed yet</span></td></tr>
-            <tr><td>Deployment &amp; DevOps</td><td>Dry run, real run, then auto-deploy. <code>--delete</code> removes anything not in Git, and no link check runs first. The role was made by hand. Next: Terraform, pin actions to commit SHAs with Dependabot, and a link check. Each real deploy clears the CloudFront cache.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Requirements &amp; workload</td><td>One maintainer, a few merges a week, one repository. A pull request merging into <code>main</code> publishes <code>src/</code>.</td><td>"Merging a pull request into main is what publishes the site."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Scalability &amp; performance</td><td>One deploy at a time. <a href="https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html" target="_blank" rel="noopener"><code>aws s3 sync</code></a> re-uploads every file on each run, which is fine for a small site.</td><td>"The sync re-uploads every file on each run, which is fine for a site this small."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Availability &amp; fault tolerance</td><td>The site keeps serving if the pipeline is down, and a repository variable pauses deploys. Rolling back by reverting the commit is untested. The pipeline depends on GitHub.</td><td>"The site keeps serving if the pipeline is down. Rolling back by reverting is untested."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Data &amp; consistency</td><td>n/a — static files only; Git is the source of truth.</td><td>—</td><td><span class="pill pill--na">n/a</span></td></tr>
+            <tr><td>Security</td><td>An OIDC role instead of stored keys: a leaked key works until someone notices, while an OIDC login expires in about an hour. The role trusts only this repository, the <code>production</code> environment and <code>main</code>, and reaches one bucket. It can also clear the cache of one CloudFront distribution.</td><td>"There are no AWS keys to leak. GitHub gets a login that expires in about an hour, and the role reaches one bucket."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Observability</td><td>Each run logs every upload and delete. Failure alerts are missing.</td><td>—</td><td><span class="pill pill--na">Not addressed yet</span></td></tr>
+            <tr><td>Deployment &amp; DevOps</td><td>Dry run, real run, then auto-deploy. <code>--delete</code> removes anything not in Git, and no link check runs first. The role was made by hand. Next: Terraform, pin actions to commit SHAs with Dependabot, and a link check. Each real deploy clears the CloudFront cache.</td><td>"A dry run showed 10 uploads and 1 delete before the real run. Copying to S3 does not refresh CloudFront, so each deploy clears its cache."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
             <tr class="is-best"><td>Cost &amp; trade-offs</td><td>$0 for the pipeline (estimate); GitHub Actions is free for public repositories. Rejected: stored access keys, because a long-lived key can leak; AWS CodePipeline and CodeBuild, $0–1 plus build minutes and more services to set up; EC2 with SSH, about $8 or more and a server to patch for static files; AWS Amplify Hosting, which hides the pieces I wanted to learn. Sources:
               <a href="https://docs.github.com/en/billing/concepts/product-billing/github-actions" target="_blank" rel="noopener">GitHub Actions</a> ·
               <a href="https://aws.amazon.com/codepipeline/pricing/" target="_blank" rel="noopener">CodePipeline</a> ·
               <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2</a> ·
-              <a href="https://aws.amazon.com/amplify/pricing/" target="_blank" rel="noopener">Amplify</a></td><td><span class="pill pill--decided">Addressed</span></td></tr>
+              <a href="https://aws.amazon.com/amplify/pricing/" target="_blank" rel="noopener">Amplify</a></td><td>"The pipeline costs $0 because GitHub Actions is free for public repositories."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
           </tbody>
         </table>
       </div>

@@ -34,7 +34,9 @@ appcomplish-portfolio/
 │   ├── index.html                     # Landing page (the only index.html)
 │   ├── about.html                     # About / Bio
 │   ├── resume.html                    # Résumé
-│   ├── projects.html                  # All-projects listing
+│   ├── aws-cloud.html                 # Section page: every AWS & Cloud Engineering project
+│   ├── devops.html                    # Section page: every DevOps & Automation project
+│   ├── ai-automation.html             # Section page: every AI & Automation project
 │   ├── 404.html                       # Not-found page
 │   ├── robots.txt
 │   ├── projects/
@@ -78,7 +80,7 @@ appcomplish-portfolio/
 | Top-level page               | `src/<page>.html`                            | Descriptive name (about, resume, 404)      |
 | Project case study           | `src/projects/<slug>.html`                    | Start from the template, or run `/project <slug>` |
 | Case study template          | `docs/templates/project-case-study.html`     | Not deployed                               |
-| All-projects listing         | `src/projects.html`                            | Entry point to case studies                |
+| Section page                 | `src/<section>.html`                           | `aws-cloud`, `devops`, `ai-automation`. Lists every card for that section. Add each new project's card to the landing page and its section page. There is no all-projects page; the top nav links to the three section pages. Every page except the landing page has a `← Home` back-link above its content (case studies show it above their section back-link). The landing page shows every card in a section, and each landing section header always links to its own section page with an explicit name (`<a href="<section>.html">See all AI &amp; Automation projects →</a>`). The landing page has no generic "See all projects" link. The landing page grid is `card-grid` (3 columns); the section pages use `card-grid card-grid--list` (one card per row) |
 | Global CSS                   | `src/assets/css/style.css`                   | Single stylesheet, design tokens at :root  |
 | Global JS                    | `src/assets/js/main.js`                      | Minimal; avoid frameworks                  |
 | Architecture diagram (image) | `src/assets/images/projects/<slug>/`         | PNG or SVG; referenced by case study HTML  |
@@ -132,16 +134,16 @@ appcomplish-portfolio/
 
 ## Project Case Study Standard
 
-Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html`: **a START block plus five parts, about 600–800 words**, written so a recruiter gets the point in 30 seconds and the detail in two minutes. Each fact appears once.
+Every `src/projects/<slug>.html` follows `docs/templates/project-case-study.html`: **Business Requirement first, then a START block and four more parts, about 700–900 words**, written so a recruiter gets the point in 30 seconds and the detail in two minutes. Each fact appears once.
 
 | # | Section | Purpose |
 |---|---|---|
-| 0 | START | Top of the page, `id="start"`, with a "Jump to START ↓" link in the header. Five one-line rows: Situation (why it was needed), Task (the goal), Action (what I did), Result (what I can show), Takeaway (what I learned). Summarise the sections below, never repeat them |
-| 1 | Business Requirement | Starts straight with the requirement ("Build a ... that must ...", own domain, no stored keys, low cost...) in one short paragraph, no backstory, then the design question |
-| 2 | At a glance | Key decision, Stack (with region), Monthly cost (estimate), Status. A Source row (GitHub link) is allowed on CI/CD pages |
-| 3 | Figure | One diagram and a short caption, then an optional Proof line (a result that shows it works). Pages that will get an architecture image keep a "coming soon" slot until it exists; CI/CD pages have none. Run `/diagram <slug>` for the layout standard. Under the Figure, a collapsible services list (`<details class="services">`): one row per AWS service or tool actually used, with its purpose here and a link to its official page |
-| 4 | Problems I Hit and How I Fixed Them | Real problems only. Each is a red callout (Trying to, What happened, Why) followed by a green Fix callout with numbered steps that name where to click. Omit the section when nothing went wrong; never invent a problem. An option table is allowed for a decision that mattered |
-| 5 | Design Considerations | The 8 Core categories from `docs/system-design-concepts.md`, columns Category, Decision, Status. Cost lives in its row: the estimate, the rejected AWS options and the pricing links |
+| 1 | Business Requirement | First on the page, above START. Starts straight with the requirement ("Build a ... that must ...", own domain, no stored keys, low cost...) in one short paragraph, no backstory, then the design question. It ends with a Source line saying where the idea came from: `My own idea to practice.`, `Digital Cloud Training lab, <lab title>.` (link "Digital Cloud Training" to https://learn.digitalcloud.training/courses) or a link to the URL I found, with its title. Ask me, never guess |
+| 2 | START | Directly below Business Requirement, `id="start"`, with a "Jump to START ↓" link in the header. Five one-line rows: Situation (why it was needed), Task (the goal), Action (what I did), Result (what I can show), Takeaway (what I learned). Summarise the sections below, never repeat them |
+| 3 | At a glance | Key decision, Stack (with region), Monthly cost (estimate), Status. A Source row (GitHub link) is allowed on CI/CD pages |
+| 4 | Figure | One diagram and a short caption, then an optional Proof line (a result that shows it works). Pages that will get an architecture image keep a "coming soon" slot until it exists; CI/CD pages have none. Run `/diagram <slug>` for the layout standard. Under the Figure, a collapsible services list (`<details class="services">`): one row per AWS service or tool actually used, with its purpose here and a link to its official page |
+| 5 | Problems I Hit and How I Fixed Them | Real problems only. Each is a red callout (Trying to, What happened, Why) followed by a green Fix callout with numbered steps that name where to click. Omit the section when nothing went wrong; never invent a problem. An option table is allowed for a decision that mattered |
+| 6 | Design Considerations | The 8 Core categories from `docs/system-design-concepts.md`, columns Category, Decision, How I'd explain it, Status. "How I'd explain it" is one first-person line a reader could say aloud, built only from what was built, seen or sourced; write "—" for `n/a` and Not addressed yet rows. Cost lives in its row: the estimate, the rejected AWS options and the pricing links |
 
 - **Status labels** (Design Considerations): `Addressed`, `Partly addressed`, `Not addressed yet`, or `n/a` with a reason in the Decision. Use "Not available" for a value you cannot find.
 - **Callout classes:** `callout--problem` (red), `callout--fix` (green), `diagram-slot` (reserved image space). Colour tokens are in `style.css`.

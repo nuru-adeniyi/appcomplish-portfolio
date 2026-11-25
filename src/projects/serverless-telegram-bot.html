@@ -23,7 +23,9 @@
         </svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../aws-cloud.html">AWS &amp; Cloud</a></li>
+        <li><a href="../devops.html">DevOps</a></li>
+        <li><a href="../ai-automation.html" class="active">AI &amp; Automation</a></li>
         <li><a href="../about.html">About</a></li>
         <li><a href="../resume.html">Resume &amp; Certs</a></li>
       </ul>
@@ -32,7 +34,8 @@
 
   <header class="article-header">
     <div class="container--narrow">
-      <a class="back-link" href="../projects.html">← All Projects</a>
+      <a class="back-link" href="../index.html">← Home</a>
+      <a class="back-link" href="../ai-automation.html">← All AI &amp; Automation projects</a>
       <div class="tag-row">
         <span class="tag">Lambda</span>
         <span class="tag">API Gateway</span>
@@ -53,6 +56,18 @@
   <article class="article-body">
     <div class="container--narrow">
 
+      <!-- 1. Business Requirement -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>
+          Build a Telegram bot that answers a small bakery's sales questions from live Square data, with no
+          server to keep running, a public HTTPS address that only genuine Telegram messages can use, and a
+          bill close to $0.
+        </p>
+        <p><strong>How would you host a chat bot that is idle most of the day?</strong></p>
+        <p><strong>Source:</strong> My own idea to practice.</p>
+      </div>
+
       <!-- START: Situation, Task, Action, Result, Takeaway -->
       <section id="start" aria-labelledby="start-heading">
         <h2 id="start-heading">START</h2>
@@ -69,17 +84,6 @@
           </table>
         </div>
       </section>
-
-      <!-- 1. Business Requirement -->
-      <div class="callout">
-        <div class="callout-label">Business Requirement</div>
-        <p>
-          Build a Telegram bot that answers a small bakery's sales questions from live Square data, with no
-          server to keep running, a public HTTPS address that only genuine Telegram messages can use, and a
-          bill close to $0.
-        </p>
-        <p><strong>How would you host a chat bot that is idle most of the day?</strong></p>
-      </div>
 
       <!-- 2. At a glance -->
       <dl class="glance">
@@ -232,23 +236,24 @@
       <h2>Design Considerations</h2>
       <div class="table-wrap">
         <table class="cost-table design-table">
-          <thead><tr><th>Category</th><th>Decision</th><th>Status</th></tr></thead>
+          <thead><tr><th>Category</th><th>Decision</th><th>How I'd explain it</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>Requirements &amp; workload</td><td>A private bot for the bakery's owners: only chat IDs on an allow-list get answers. Idle most of the day, so it runs only when a message arrives.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
-            <tr><td>Scalability &amp; performance</td><td>Lambda starts one invocation per message. The handler builds fresh clients every time, trading a little speed for avoiding a reused event loop. API Gateway cuts integrations off at about 29 seconds, so day-by-day questions are capped at 180 days and monthly ones at 36 months.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
-            <tr><td>Availability &amp; fault tolerance</td><td>Managed services only, with no extra redundancy built. Handled errors still return 200, because any other reply makes Telegram resend the same message. Alarms and a dead-letter queue are missing.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
-            <tr><td>Data &amp; consistency</td><td>n/a — no database; Square stores the sales data and the bot reads it live.</td><td><span class="pill pill--na">n/a</span></td></tr>
-            <tr><td>Security</td><td>Secret-token check, chat allow-list, and an execution role that can only write logs. The deploy user can reach one ECR repository and one function. Weak spots: API keys sit in Lambda environment variables, readable by anyone with console access, and the deploy user has a long-lived access key, unlike the OIDC role in my <a href="s3-cicd-pipeline.html">S3 pipeline</a>.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
-            <tr><td>Observability</td><td>Logs go to CloudWatch, including rejected calls and failed updates, and they found the cold-start problem. No metrics dashboard or alerts.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
-            <tr><td>Deployment &amp; DevOps</td><td>Terraform builds the infrastructure. A merge touching <code>src/</code> runs lint and tests, pushes a commit-tagged image, updates the function and waits until it is ready. An ECR lifecycle policy keeps the latest 10 images. Terraform state is a local file, not shared.</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
-            <tr class="is-best"><td>Cost &amp; trade-offs</td><td>Under $1 a month (estimate). <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="noopener">Lambda</a> and <a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank" rel="noopener">API Gateway</a> bill per request, so an idle bot costs almost nothing. <a href="https://aws.amazon.com/ecr/pricing/" target="_blank" rel="noopener">ECR</a> storage is the one steady charge; the lifecycle policy stops old images piling up. Rejected: an always-on <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2</a> instance or <a href="https://aws.amazon.com/fargate/pricing/" target="_blank" rel="noopener">AWS Fargate</a> task, billed all day for a bot that is idle most of it; and a Lambda Function URL, which my account blocks.</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Requirements &amp; workload</td><td>A private bot for the bakery's owners: only chat IDs on an allow-list get answers. Idle most of the day, so it runs only when a message arrives.</td><td>"It is a private bot for the bakery's owners, and it only runs when a message arrives."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Scalability &amp; performance</td><td>Lambda starts one invocation per message. The handler builds fresh clients every time, trading a little speed for avoiding a reused event loop. API Gateway cuts integrations off at about 29 seconds, so day-by-day questions are capped at 180 days and monthly ones at 36 months.</td><td>"Each message starts one Lambda invocation. API Gateway cuts calls off at about 29 seconds, so I capped day-by-day questions at 180 days."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Availability &amp; fault tolerance</td><td>Managed services only, with no extra redundancy built. Handled errors still return 200, because any other reply makes Telegram resend the same message. Alarms and a dead-letter queue are missing.</td><td>"Handled errors still return 200, because any other reply makes Telegram resend the message. I have no alarms or dead-letter queue yet."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Data &amp; consistency</td><td>n/a — no database; Square stores the sales data and the bot reads it live.</td><td>—</td><td><span class="pill pill--na">n/a</span></td></tr>
+            <tr><td>Security</td><td>Secret-token check, chat allow-list, and an execution role that can only write logs. The deploy user can reach one ECR repository and one function. Weak spots: API keys sit in Lambda environment variables, readable by anyone with console access, and the deploy user has a long-lived access key, unlike the OIDC role in my <a href="s3-cicd-pipeline.html">S3 pipeline</a>.</td><td>"The code returns 401 without Telegram's secret and only answers chats on the allow-list. Two weak spots remain: API keys in environment variables and a long-lived deploy key."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Observability</td><td>Logs go to CloudWatch, including rejected calls and failed updates, and they found the cold-start problem. No metrics dashboard or alerts.</td><td>"The CloudWatch logs found my cold-start problem, but I have no dashboard or alerts."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Deployment &amp; DevOps</td><td>Terraform builds the infrastructure. A merge touching <code>src/</code> runs lint and tests, pushes a commit-tagged image, updates the function and waits until it is ready. An ECR lifecycle policy keeps the latest 10 images. Terraform state is a local file, not shared.</td><td>"A merge that changes src/ runs the tests, pushes an image and updates the function. Terraform state is still a local file."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr class="is-best"><td>Cost &amp; trade-offs</td><td>Under $1 a month (estimate). <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="noopener">Lambda</a> and <a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank" rel="noopener">API Gateway</a> bill per request, so an idle bot costs almost nothing. <a href="https://aws.amazon.com/ecr/pricing/" target="_blank" rel="noopener">ECR</a> storage is the one steady charge; the lifecycle policy stops old images piling up. Rejected: an always-on <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2</a> instance or <a href="https://aws.amazon.com/fargate/pricing/" target="_blank" rel="noopener">AWS Fargate</a> task, billed all day for a bot that is idle most of it; and a Lambda Function URL, which my account blocks.</td><td>"I pay per message, not for a server that sits idle."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="callout" style="margin-top:2rem;">
         <div class="callout-label">Related</div>
-        The same <a href="s3-cicd-pipeline.html">GitHub Actions pipeline pattern</a> deploys this site to Amazon S3.
+        The same <a href="s3-cicd-pipeline.html">GitHub Actions pipeline pattern</a> deploys this site to Amazon S3. For a queue-based design, see the
+        <a href="serverless-web-application.html">Serverless Web Application</a>.
       </div>
 
     </div>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <title>Serverless Web Application — Nurudeen Adeniyi</title>
+  <meta name="description" content="Case study: a static web form in Amazon S3 that sends product purchases through API Gateway, Lambda and SQS into DynamoDB. Decisions, tradeoffs and the CORS problem I hit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+  <nav class="nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Nurudeen <span>Adeniyi</span></a>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle menu">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../aws-cloud.html" class="active">AWS &amp; Cloud</a></li>
+        <li><a href="../devops.html">DevOps</a></li>
+        <li><a href="../ai-automation.html">AI &amp; Automation</a></li>
+        <li><a href="../about.html">About</a></li>
+        <li><a href="../resume.html">Resume &amp; Certs</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="article-header">
+    <div class="container--narrow">
+      <a class="back-link" href="../index.html">← Home</a>
+      <a class="back-link" href="../aws-cloud.html">← All AWS &amp; Cloud Engineering projects</a>
+      <div class="tag-row">
+        <span class="tag">AWS</span>
+        <span class="tag">S3</span>
+        <span class="tag">API Gateway</span>
+        <span class="tag">Lambda</span>
+        <span class="tag">SQS</span>
+        <span class="tag">DynamoDB</span>
+      </div>
+      <span class="card-status card-status--built">Built</span>
+      <h1>Serverless Web Application</h1>
+      <div class="article-meta">
+        <span>Built: November 2026</span>
+        <a href="#start">Jump to START ↓</a>
+      </div>
+    </div>
+  </header>
+
+  <article class="article-body">
+    <div class="container--narrow">
+
+      <!-- 1. Business Requirement -->
+      <div class="callout">
+        <div class="callout-label">Business Requirement</div>
+        <p>
+          Build a serverless web application on AWS where a static web form hosted in Amazon S3 sends
+          product-purchase details through Amazon API Gateway and AWS Lambda into an Amazon SQS queue,
+          and a second Lambda function writes each one to an Amazon DynamoDB table. It must need no
+          servers to manage and keep the web form, queue and database as separate pieces.
+        </p>
+        <p><strong>How would you accept form submissions from a website without running a server?</strong></p>
+        <p><strong>Source:</strong> <a href="https://learn.digitalcloud.training/courses" target="_blank" rel="noopener">Digital Cloud Training</a> lab, "Build a Serverless Web Application" (Cloud Mastery Bootcamp).</p>
+      </div>
+
+      <!-- START: Situation, Task, Action, Result, Takeaway -->
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading">START</h2>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Step</th><th>In short</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Situation</strong></td><td>I wanted to learn how an app takes data from a public form through a queue to a database, and to practice more event-driven architecture, using AWS services only.</td></tr>
+              <tr><td><strong>Task</strong></td><td>Take product-purchase details from a web form hosted in Amazon S3 and store them in Amazon DynamoDB, with no servers to manage.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Built it by hand in the AWS console: Amazon API Gateway, two AWS Lambda functions, each with its own AWS Identity and Access Management (IAM) role, an Amazon SQS queue, a DynamoDB table and the S3 website.</td></tr>
+              <tr><td><strong>Result</strong></td><td>Submitting the form adds the item to the DynamoDB table, the five sample messages I sent from AWS CloudShell all arrived, and the queue triggers the writer function by itself.</td></tr>
+              <tr><td><strong>Takeaway</strong></td><td>A Cross-Origin Resource Sharing (CORS) error can hide a missing method, so check that the method exists on the exact resource path before debugging headers.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2. At a glance -->
+      <dl class="glance">
+        <div><dt>Key decision</dt><dd>An <a href="https://aws.amazon.com/sqs/" target="_blank" rel="noopener">Amazon SQS</a> queue between two Lambda functions, so receiving the form and writing to the database are separate steps</dd></div>
+        <div><dt>Stack</dt><dd><a href="https://aws.amazon.com/s3/" target="_blank" rel="noopener">Amazon S3</a>, <a href="https://aws.amazon.com/api-gateway/" target="_blank" rel="noopener">Amazon API Gateway</a>, <a href="https://aws.amazon.com/lambda/" target="_blank" rel="noopener">AWS Lambda</a> (Python 3.12), Amazon SQS, <a href="https://aws.amazon.com/dynamodb/" target="_blank" rel="noopener">Amazon DynamoDB</a>, <a href="https://aws.amazon.com/iam/" target="_blank" rel="noopener">AWS IAM</a>, in us-east-1</dd></div>
+        <div><dt>Monthly cost</dt><dd>Under $1 (estimate)</dd></div>
+        <div><dt>Status</dt><dd>Built and tested in the AWS console</dd></div>
+      </dl>
+
+      <!-- 3. Figure -->
+      <div class="diagram-box">
+        <img src="../assets/images/projects/serverless-web-application/architecture.svg" width="900" height="626"
+             alt="Architecture of the serverless web application in one AWS account, Region us-east-1. 1: a visitor's browser loads the web form from an Amazon S3 static website. 2: the browser sends a PUT request to /productpurchase on Amazon API Gateway. 3: API Gateway invokes the AWS Lambda function productPurchasesSendDataToQueue. 4: that function puts a message in the Amazon SQS queue ProductPurchasesDataQueue. 5: the queue's trigger invokes the AWS Lambda function productPurchasesDataHandler. 6: that function writes the item to the Amazon DynamoDB table ProductPurchases. 7: API Gateway returns a response to the browser." />
+      </div>
+      <p class="diagram-caption">Figure 1 — The queue sits between the two AWS Lambda functions, so receiving a form and writing to Amazon DynamoDB are separate steps. The browser calls the API directly, which is why the API needs CORS and a <code>PUT</code> method on <code>/productpurchase</code> (Problem 1).</p>
+      <p><strong>Proof:</strong> submitting the form added the item to the <code>ProductPurchases</code> table. The five sample message files, sent from AWS CloudShell with <code>aws sqs send-message</code>, all appeared in the table with no manual step between the queue and the table.</p>
+
+      <details class="services">
+        <summary>AWS services in this design and what each does</summary>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead><tr><th>Service</th><th>Purpose here</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html" target="_blank" rel="noopener">Amazon S3 static website</a></td><td>Hosts the web form. The website endpoint serves it over HTTP only.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/api-gateway/" target="_blank" rel="noopener">Amazon API Gateway</a></td><td>The REST API <code>productPurchase</code>: a <code>PUT</code> method on <code>/productpurchase</code> passes the form data to Lambda, deployed to the <code>dev</code> stage with <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html" target="_blank" rel="noopener">CORS</a> enabled.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/lambda/" target="_blank" rel="noopener">AWS Lambda</a>: <code>productPurchasesSendDataToQueue</code></td><td>Receives the form data from the API and puts it in the queue as a message.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/sqs/" target="_blank" rel="noopener">Amazon SQS</a></td><td>A <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html" target="_blank" rel="noopener">Standard queue</a>, <code>ProductPurchasesDataQueue</code>, that holds each purchase until it is processed.</td></tr>
+              <tr><td>AWS Lambda: <code>productPurchasesDataHandler</code></td><td>Started by the queue with an <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html" target="_blank" rel="noopener">SQS trigger</a>; writes each message to the table.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/dynamodb/" target="_blank" rel="noopener">Amazon DynamoDB</a></td><td>The <code>ProductPurchases</code> table, with <code>ProductPurchaseKey</code> as the <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html" target="_blank" rel="noopener">partition key</a>.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/iam/" target="_blank" rel="noopener">AWS IAM</a></td><td>One policy and one role for each Lambda function.</td></tr>
+              <tr><td><a href="https://aws.amazon.com/cloudshell/" target="_blank" rel="noopener">AWS CloudShell</a></td><td>Uploaded the website files with <code>aws s3 sync</code> and sent the test messages to the queue.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <!-- 4. Problems -->
+      <h2 id="problems">Problems I Hit and How I Fixed Them</h2>
+
+      <div class="callout callout--problem">
+        <div class="callout-label">Problem 1</div>
+        <p><strong>The form's request was blocked with a CORS error</strong><br />
+          <strong>Trying to:</strong> submit the web form on the S3 website so the browser sends a <code>PUT</code> request to <code>/productpurchase</code> on the API.<br />
+          <strong>What happened:</strong> the browser blocked the request with a 403 Forbidden and <code>No 'Access-Control-Allow-Origin' header is present on the requested resource</code>. I spent a while checking the Lambda function's policies and code, enabling CORS, checking the <code>OPTIONS</code> mock integration headers, returning <code>Access-Control-Allow-*</code> headers from the function and redeploying the <code>dev</code> stage. None of it helped, and the AI assistants I asked kept sending me back to API Gateway policies, headers and other settings.<br />
+          <strong>Why:</strong> I had created the <code>PUT</code> method on the root resource (<code>/</code>) instead of under <code>/productpurchase</code>, so the target path had only <code>OPTIONS</code>. The request was not finding the right route at all, so the policies, headers and code I kept checking were never the cause.</p>
+      </div>
+      <div class="callout callout--fix">
+        <div class="callout-label">Fix</div>
+        <ol>
+          <li><strong>API Gateway</strong> → <strong>APIs</strong> → <code>productPurchase</code> → <strong>Resources</strong> → select the <code>PUT</code> under <code>/</code> → <strong>Delete method</strong>.</li>
+          <li>Select <code>/productpurchase</code> → <strong>Create method</strong> → <code>PUT</code> → integration type <strong>Lambda function</strong> → turn on <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html" target="_blank" rel="noopener">Lambda proxy integration</a> → pick <code>productPurchasesSendDataToQueue</code> → <strong>Create method</strong>.</li>
+          <li>With <code>/productpurchase</code> selected, check that CORS is enabled. If it is not, choose <strong>Enable CORS</strong> and save.</li>
+          <li><strong>Deploy API</strong> → stage <code>dev</code>, then submit the form again.</li>
+        </ol>
+        <p><strong>Lesson:</strong> a CORS or 403 error can mean the request is not finding a route at all. Before checking policies, headers or code, confirm the <code>PUT</code> method is nested under <code>/productpurchase</code> and not left at the root <code>/</code>.</p>
+      </div>
+
+      <!-- 5. Design Considerations (includes cost) -->
+      <h2>Design Considerations</h2>
+      <div class="table-wrap">
+        <table class="cost-table design-table">
+          <thead><tr><th>Category</th><th>Decision</th><th>How I'd explain it</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Requirements &amp; workload</td><td>Shop owners enter purchases by hand in a web form. Nothing runs until a form is submitted, so it needs no always-on server.</td><td>"Shop owners type in a purchase, and nothing runs until they submit it."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Scalability &amp; performance</td><td>Each submission becomes one queue message, and the writer function starts when a message arrives. Load not tested.</td><td>"Each purchase is one message, and I have not load-tested it."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Availability &amp; fault tolerance</td><td>Per the AWS docs, the <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html" target="_blank" rel="noopener">SQS trigger</a> keeps a message in the queue until the writer function processes it. I did not test a failure. No dead-letter queue was set up, and everything runs in one Region.</td><td>"AWS says the queue holds a purchase until the writer function handles it. I did not test a failure and set up no dead-letter queue."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Data &amp; consistency</td><td>One DynamoDB table, <code>ProductPurchases</code>, with <code>ProductPurchaseKey</code> as the partition key. Each purchase is one item.</td><td>"One purchase is one item, found by its ProductPurchaseKey."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+            <tr><td>Security</td><td>Each Lambda function has its own IAM policy and role. The S3 bucket is public for the website (Block Public Access off) and the website endpoint is HTTP only. No login was added to the API.</td><td>"Each function has its own role, but the website is HTTP only and the API has no login."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr><td>Observability</td><td>No alarms or dashboards were set up.</td><td>—</td><td><span class="pill pill--na">Not addressed yet</span></td></tr>
+            <tr><td>Deployment &amp; DevOps</td><td>Built by hand in the AWS console to learn each piece. The website files were uploaded with <code>aws s3 sync</code> from CloudShell. No infrastructure as code.</td><td>"I built it by hand in the console to learn each piece, so nothing is repeatable yet."</td><td><span class="pill pill--planned">Partly addressed</span></td></tr>
+            <tr class="is-best"><td>Cost &amp; trade-offs</td><td>Under $1 a month (estimate): Lambda, API Gateway, SQS and DynamoDB bill by use, and S3 holds a few small files. Other AWS options: an always-on Amazon EC2 instance, about $8 or more a month plus patching; an AWS Fargate task, billed per hour while it runs. Sources:
+              <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="noopener">Lambda</a> ·
+              <a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank" rel="noopener">API Gateway</a> ·
+              <a href="https://aws.amazon.com/sqs/pricing/" target="_blank" rel="noopener">SQS</a> ·
+              <a href="https://aws.amazon.com/dynamodb/pricing/" target="_blank" rel="noopener">DynamoDB</a> ·
+              <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a> ·
+              <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2</a> ·
+              <a href="https://aws.amazon.com/fargate/pricing/" target="_blank" rel="noopener">Fargate</a></td><td>"It costs almost nothing because I pay per request, not for idle servers."</td><td><span class="pill pill--decided">Addressed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout" style="margin-top:2rem;">
+        <div class="callout-label">Related</div>
+        Another API Gateway and Lambda design is the
+        <a href="serverless-telegram-bot.html">Serverless Telegram Bot</a>.
+        <a href="../aws-cloud.html">See all AWS &amp; Cloud Engineering projects →</a>
+      </div>
+
+    </div>
+  </article>
+
+  <footer>
+    <p>
+      Nurudeen Adeniyi ·
+      <a href="https://github.com/nuru-adeniyi" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nurudeen-adeniyi-06249b9" target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
