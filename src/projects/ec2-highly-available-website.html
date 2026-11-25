@@ -98,97 +98,10 @@
 
       <!-- 3. Figure -->
       <div class="diagram-box">
-        <svg viewBox="0 0 760 584" role="img" aria-label="Web tier: a visitor's browser sends an HTTP request to the internet-facing Application Load Balancer in the public subnets. The load balancer forwards it to Amazon EC2 instances in the Auto Scaling group, in private subnets in two Availability Zones. The instances reach the internet only outbound, through a NAT Gateway in a public subnet. Latest news: JavaScript in the browser calls a Lambda Function URL, which runs the UpdateWebpageFunction AWS Lambda function, which reads the Amazon DynamoDB table. Scheduled update: an Amazon EventBridge schedule runs the RSS Lambda function, which writes to the same DynamoDB table. View counter: JavaScript in the browser calls a second Lambda Function URL, which runs the Increment View Counter function, which updates the view count in DynamoDB. Contact form: the browser calls a third Lambda Function URL, which runs the Contact Form function, which publishes to an Amazon SNS topic that sends an email notification." style="width:100%;height:auto;">
-          <defs>
-            <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0L10 5L0 10z" fill="var(--text-muted)"/>
-            </marker>
-          </defs>
-          <g font-family="Inter, system-ui, sans-serif" font-size="13" text-anchor="middle">
-            <text x="6" y="22" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">WEB TIER (CUSTOM VPC, TWO AVAILABILITY ZONES)</text>
-            <g stroke="var(--border)" fill="var(--bg-subtle)">
-              <rect x="6" y="34" width="110" height="64" rx="8"/>
-              <rect x="150" y="34" width="170" height="64" rx="8"/>
-              <rect x="354" y="34" width="190" height="64" rx="8"/>
-              <rect x="578" y="34" width="176" height="64" rx="8"/>
-            </g>
-            <g fill="var(--text)" font-weight="600">
-              <text x="61" y="60">Visitor</text><text x="235" y="60">Application LB</text><text x="449" y="60">EC2 instances</text><text x="666" y="60">NAT Gateway</text>
-            </g>
-            <g fill="var(--text-muted)" font-size="11.5">
-              <text x="61" y="78">HTTP</text><text x="235" y="78">public subnets, HTTP 80</text><text x="449" y="78">Auto Scaling, private subnets</text><text x="666" y="78">outbound only</text>
-            </g>
-            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
-              <line x1="118" y1="66" x2="146" y2="66"/><line x1="322" y1="66" x2="350" y2="66"/><line x1="546" y1="66" x2="574" y2="66"/>
-            </g>
-            <text x="6" y="140" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">LATEST NEWS (SERVERLESS)</text>
-            <g stroke="var(--border)" fill="var(--bg-subtle)">
-              <rect x="6" y="152" width="140" height="64" rx="8"/>
-              <rect x="180" y="152" width="140" height="64" rx="8"/>
-              <rect x="354" y="152" width="190" height="64" rx="8"/>
-              <rect x="578" y="152" width="176" height="64" rx="8"/>
-            </g>
-            <g fill="var(--text)" font-weight="600">
-              <text x="76" y="178">Browser</text><text x="250" y="178">Function URL</text><text x="449" y="178">UpdateWebpageFunction</text><text x="666" y="178">DynamoDB</text>
-            </g>
-            <g fill="var(--text-muted)" font-size="11.5">
-              <text x="76" y="196">website JavaScript</text><text x="250" y="196">public HTTPS endpoint</text><text x="449" y="196">Lambda, reads records</text><text x="666" y="196">latest-news table</text>
-            </g>
-            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
-              <line x1="148" y1="184" x2="176" y2="184"/><line x1="322" y1="184" x2="350" y2="184"/><line x1="546" y1="184" x2="574" y2="184"/>
-            </g>
-            <text x="6" y="258" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">SCHEDULED UPDATE</text>
-            <g stroke="var(--border)" fill="var(--bg-subtle)">
-              <rect x="6" y="270" width="170" height="64" rx="8"/>
-              <rect x="210" y="270" width="170" height="64" rx="8"/>
-              <rect x="414" y="270" width="176" height="64" rx="8"/>
-            </g>
-            <g fill="var(--text)" font-weight="600">
-              <text x="91" y="296">EventBridge</text><text x="295" y="296">RSS Lambda</text><text x="502" y="296">DynamoDB</text>
-            </g>
-            <g fill="var(--text-muted)" font-size="11.5">
-              <text x="91" y="314">schedule</text><text x="295" y="314">fetches the RSS feed</text><text x="502" y="314">same table, new records</text>
-            </g>
-            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
-              <line x1="178" y1="302" x2="206" y2="302"/><line x1="382" y1="302" x2="410" y2="302"/>
-            </g>
-            <text x="6" y="376" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">VIEW COUNTER</text>
-            <g stroke="var(--border)" fill="var(--bg-subtle)">
-              <rect x="6" y="388" width="140" height="64" rx="8"/>
-              <rect x="180" y="388" width="140" height="64" rx="8"/>
-              <rect x="354" y="388" width="190" height="64" rx="8"/>
-              <rect x="578" y="388" width="176" height="64" rx="8"/>
-            </g>
-            <g fill="var(--text)" font-weight="600">
-              <text x="76" y="414">Browser</text><text x="250" y="414">Function URL</text><text x="449" y="414">Increment View Counter</text><text x="666" y="414">DynamoDB</text>
-            </g>
-            <g fill="var(--text-muted)" font-size="11.5">
-              <text x="76" y="432">website JavaScript</text><text x="250" y="432">public HTTPS endpoint</text><text x="449" y="432">Lambda, adds one view</text><text x="666" y="432">view count</text>
-            </g>
-            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
-              <line x1="148" y1="420" x2="176" y2="420"/><line x1="322" y1="420" x2="350" y2="420"/><line x1="546" y1="420" x2="574" y2="420"/>
-            </g>
-            <text x="6" y="494" text-anchor="start" fill="var(--text-muted)" font-weight="700" font-size="12">CONTACT FORM</text>
-            <g stroke="var(--border)" fill="var(--bg-subtle)">
-              <rect x="6" y="506" width="130" height="64" rx="8"/>
-              <rect x="166" y="506" width="130" height="64" rx="8"/>
-              <rect x="326" y="506" width="140" height="64" rx="8"/>
-              <rect x="496" y="506" width="120" height="64" rx="8"/>
-              <rect x="646" y="506" width="108" height="64" rx="8"/>
-            </g>
-            <g fill="var(--text)" font-weight="600">
-              <text x="71" y="532">Browser</text><text x="231" y="532">Function URL</text><text x="396" y="532">Contact Form</text><text x="556" y="532">SNS topic</text><text x="700" y="532">Email</text>
-            </g>
-            <g fill="var(--text-muted)" font-size="11.5">
-              <text x="71" y="550">form submit</text><text x="231" y="550">public HTTPS</text><text x="396" y="550">Lambda function</text><text x="556" y="550">publishes message</text><text x="700" y="550">notification</text>
-            </g>
-            <g stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow3)">
-              <line x1="138" y1="538" x2="162" y2="538"/><line x1="298" y1="538" x2="322" y2="538"/><line x1="468" y1="538" x2="492" y2="538"/><line x1="618" y1="538" x2="642" y2="538"/>
-            </g>
-          </g>
-        </svg>
+        <img src="../assets/images/projects/ec2-highly-available-website/architecture.svg" width="1000" height="890"
+             alt="Architecture of the highly available website in one AWS account, Region us-east-1. 1: a visitor's browser sends an HTTP request to the Internet Gateway of the VPC portfolio-vpc. 2: the request reaches the internet-facing Application Load Balancer in the public subnets. 3: the load balancer forwards it to the two Amazon EC2 web servers of the Auto Scaling group in the private subnets, us-east-1a and us-east-1b. 4: the web servers reach the internet only outbound, through a NAT Gateway in the public subnets. 5: JavaScript on the page, running in the browser, calls three AWS Lambda Function URLs: the Increment View Counter function writes to an Amazon DynamoDB view count table, the Contact Form function publishes to an Amazon SNS topic that emails the message, and the UpdateWebpage function reads the AWSNews DynamoDB table. An Amazon EventBridge daily rule at 09:00 UTC runs the RSS function, which writes the news posts to the AWSNews table." />
       </div>
-      <p class="diagram-caption">Figure 1 — Visitors reach only the load balancer, so the Amazon EC2 instances can sit in private subnets and still be replaced automatically. The NAT Gateway is outbound-only: it gives those private instances internet access without letting the internet in. The news feed bypasses the servers: the browser calls a Lambda <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html" target="_blank" rel="noopener">Function URL</a>, so the Lambda and DynamoDB pieces change separately from the web servers.</p>
+      <p class="diagram-caption">Figure 1 — Visitors reach only the Application Load Balancer, so the Amazon EC2 web servers can sit in private subnets and the Auto Scaling group can replace them. The NAT Gateway lets those private servers reach the internet outbound only, without letting the internet in. The three microservices bypass the servers: the page's JavaScript calls their Lambda <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html" target="_blank" rel="noopener">Function URLs</a> directly, so each one can change without touching the web servers.</p>
       <p><strong>Proof:</strong> the load balancer's DNS name returns the website over HTTP, the view counter goes up on each load, and the target group shows 2 of 2 targets healthy. A test run of the RSS function returned 200 "News updated successfully", and <code>UpdateWebpageFunction</code> returned the 10 newest posts from DynamoDB.</p>
 
       <details class="services">
